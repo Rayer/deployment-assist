@@ -1,0 +1,6 @@
+#!ipxe
+dhcp
+kernel http://10.2.7.116:12000/vmlinuz
+initrd http://10.2.7.116:12000/target.img
+imgargs vmlinuz append stage2=initrd:
+boot
