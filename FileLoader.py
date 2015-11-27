@@ -104,6 +104,14 @@ class FileLoader:
         urllib.urlretrieve(image_path, self.scg_image_path, self.__report_hook)
         print('')
 
+        if os.path.isfile('/tmp/target.img') or os.path.islink('/tmp/target.img'):
+            os.remove('/tmp/target.img')
+        os.symlink(self.scg_image_path, '/tmp/target.img')
+
+        if os.path.isfile('/tmp/vmlinuz') or os.path.islink('/tmp/vmlinuz'):
+            os.remove('/tmp/vmlinuz')
+        os.symlink('scge_vmlinuz', '/tmp/vmlinuz')
+
     @staticmethod
     def __report_hook(chunk_order, chunk_size, total_size):
         if total_size < 1000:
