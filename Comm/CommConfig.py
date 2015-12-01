@@ -7,4 +7,4 @@ server_list = [
     {'name': 'KVM03', 'ip': '172.17.60.94'},
 ]
 
-bind_port = 17235
+proto_port = 17235

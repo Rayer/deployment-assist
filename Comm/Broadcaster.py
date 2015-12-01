@@ -11,26 +11,38 @@ This broadcaster do :
 Periodically broadcast server status.
 '''
 
-if __name__ == '__main__':
-    cs = socket(AF_INET, SOCK_DGRAM)
-    cs.setsockopt(SOL_SOCKET, SO_REUSEADDR, 1)
-    cs.setsockopt(SOL_SOCKET, SO_BROADCAST, 1)
-    cs.settimeout(1)
-    # Send 'Who is Alive?' package
-    payload_vm_status = '*__req_vm_stat %s' % '1B0291'
-    who_is_alive = '*__req_alive %s' % '1B0291'
 
-    while True:
-        # payload = Utilities.get_vm_list()
-        # payload['ip'] = '172.17.60.94'
-        print('sending : %s' % who_is_alive)
-        cs.sendto(json.dumps(who_is_alive), ('255.255.255.255', 11111))
+class Broadcaster:
+
+    def_broadcast_addr = '255.255.255.255'
+    def_buffersize = 4096
+    def_timeout = 1
+
+    def __init__(self, bind_port):
+        self.socket = socket(AF_INET, SOCK_DGRAM)
+        self.socket.setsockopt(SOL_SOCKET, SO_REUSEADDR, 1)
+        self.socket.setsockopt(SOL_SOCKET, SO_BROADCAST, 1)
+        self.socket.settimeout(self.def_timeout)
+        self.port = bind_port
+
+    def broadcast(self, payload):
+        ret = []
+        self.socket.sendto(payload, (self.def_broadcast_addr, self.port))
         try:
             while True:
-                recv, ipaddr = cs.recvfrom(4096)
-                print('recv : %s' % recv)
+                (recv, ipaddr) = self.socket.recvfrom(self.def_buffersize)
+                print('Receiving from : ' + ipaddr[0])
+                ret.append((recv,ipaddr))
         except BaseException as be:
             print(be)
-            print('Timeout')
+
+        return ret
+
+
+if __name__ == '__main__':
+    b = Broadcaster(Comm.CommConfig.proto_port)
+    payload = '*__req_addr_ '
+    while True:
+        print(b.broadcast(payload))
         time.sleep(10)
 
