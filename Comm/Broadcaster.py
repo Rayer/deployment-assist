@@ -1,20 +1,20 @@
 import zmq
 import Comm.CommConfig
 import time
-import Utilities
+from BC_Cmds.GetVMList import GetVMList
 import json
 from socket import *
 __author__ = 'rayer'
 
 '''
 This broadcaster do :
-Periodically broadcast server status.
+Periodically broadcast request, and responser will response request
 '''
 
 
 class Broadcaster:
 
-    def_broadcast_addr = '255.255.255.255'
+    def_broadcast_addr = '10.2.255.255'
     def_buffersize = 4096
     def_timeout = 1
 
@@ -25,9 +25,10 @@ class Broadcaster:
         self.socket.settimeout(self.def_timeout)
         self.port = bind_port
 
-    def broadcast(self, payload):
+    def broadcast_raw(self, raw_payload):
         ret = []
-        self.socket.sendto(payload, (self.def_broadcast_addr, self.port))
+        print('Sending : %s' % raw_payload)
+        self.socket.sendto(raw_payload, (self.def_broadcast_addr, self.port))
         try:
             while True:
                 (recv, ipaddr) = self.socket.recvfrom(self.def_buffersize)
@@ -38,11 +39,17 @@ class Broadcaster:
 
         return ret
 
+    def broadcast(self, broadcast_cmd):
+        payload = {'request': broadcast_cmd.__class__.__name__}
+        payload.update(broadcast_cmd.broadcast_payload())
+        return self.broadcast_raw(json.dumps(payload))
+
 
 if __name__ == '__main__':
     b = Broadcaster(Comm.CommConfig.proto_port)
-    payload = '*__req_addr_ '
+    # payload = '*__req_addr_ '
+    cmd = GetVMList()
     while True:
-        print(b.broadcast(payload))
+        print(b.broadcast(cmd))
         time.sleep(10)
 

@@ -6,7 +6,7 @@ __author__ = 'rayer'
 
 if __name__ == '__main__':
     cs = socket(AF_INET, SOCK_DGRAM)
-    # cs.setsockopt(SOL_SOCKET, SO_REUSEADDR, 1)
+    cs.setsockopt(SOL_SOCKET, SO_REUSEADDR, 1)
     cs.setsockopt(SOL_SOCKET, SO_BROADCAST, 1)
     cs.bind(('', Comm.CommConfig.proto_port))
 
