@@ -125,7 +125,7 @@ def get_sesame2(serial):
 def setup_system_symbolic_links(script_bin_path):
     rp = os.path.realpath(script_bin_path)
     print('realpath : %s' % rp)
-    for (source, target) in configuration.file_map:
+    for (source, target) in configuration.symbolic_link_map:
         print('Linking %(source)s to %(target)s ...' % {'source': os.path.dirname(rp) + '/' + source, 'target': target})
         if os.path.islink(target):
             os.remove(target)

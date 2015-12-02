@@ -1,9 +1,9 @@
-import zmq
 import Comm.CommConfig
 import time
-from BC_Cmds.GetVMList import GetVMList
+import Cmds
 import json
 from socket import *
+from time import gmtime, strftime
 __author__ = 'rayer'
 
 '''
@@ -40,15 +40,15 @@ class Broadcaster:
         return ret
 
     def broadcast(self, broadcast_cmd):
-        payload = {'request': broadcast_cmd.__class__.__name__}
+        payload = {'request': broadcast_cmd.__module__ + '.' + broadcast_cmd.__class__.__name__,\
+                   'time': strftime("%Y-%m-%d %H:%M:%S", gmtime())}
         payload.update(broadcast_cmd.broadcast_payload())
         return self.broadcast_raw(json.dumps(payload))
 
 
 if __name__ == '__main__':
     b = Broadcaster(Comm.CommConfig.proto_port)
-    # payload = '*__req_addr_ '
-    cmd = GetVMList()
+    cmd = Cmds.GetVMList()
     while True:
         print(b.broadcast(cmd))
         time.sleep(10)

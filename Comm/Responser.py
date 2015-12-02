@@ -2,6 +2,7 @@ from socket import *
 import Utilities
 import json
 import Comm.CommConfig
+from Comm import Cmds
 __author__ = 'rayer'
 
 if __name__ == '__main__':
@@ -14,6 +15,10 @@ if __name__ == '__main__':
         (msg, b_from) = cs.recvfrom(4096)
         print('recv broadcast : %s' % msg)
         print(b_from)
-        payload = json.dumps(Utilities.get_vm_list())
-        print(payload)
-        cs.sendto(payload, b_from)
+
+        # Find if there is valid command in Cmds module
+        eval_target = json.loads(msg).get('request') + '().handle_payload(json.loads(msg))'
+        print(eval_target)
+        ret = eval(eval_target)
+        print(ret)
+        cs.sendto(json.dumps(ret), b_from)
