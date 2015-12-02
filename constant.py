@@ -115,7 +115,7 @@ resource_map = {
                     'image': '{$root}/{$version}/scge-installer_{$version}.img'
                 },
                 'vscg': {
-                    'root': '{$master}vscg/3.1.1/installer',
+                    'root': '{$master}vscg/3.1.1.0/installer',
                     'image': '{$root}/{$version}/vscg-{$version}.qcow2'
                 }
             }
