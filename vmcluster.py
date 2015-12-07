@@ -1,8 +1,10 @@
+#!/usr/bin/python
 import argparse
 from Comm.Broadcaster import Broadcaster
 from Comm.Cmds import *
 import Comm.CommConfig
 __author__ = 'rayer'
+
 
 class CmdHandler:
     def __init__(self):
