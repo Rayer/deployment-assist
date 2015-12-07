@@ -6,12 +6,10 @@ __author__ = 'rayer'
 
 class CmdHandler:
     def __init__(self):
-        pass
+        self.broadcaster = Broadcaster(Comm.CommConfig.proto_port)
 
-    @staticmethod
-    def discovery(vm_detail=False):
-        b = Broadcaster(Comm.CommConfig.proto_port)
-        server_info_list = b.broadcast(GetVMList())
+    def discovery(self, vm_detail=False):
+        server_info_list = self.broadcaster.broadcast(GetVMList())
         for server_info in server_info_list:
             if not vm_detail:
                 print('KVM : %s\tOnline:%d\tOffline:%d' % (server_info[1][0], server_info[0]['running'].__len__(), server_info[0]['shutdown'].__len__()))
@@ -27,6 +25,12 @@ class CmdHandler:
 
             print('---------------------------')
             print('')
+
+    def remote_vm(self, vm_identifier):
+        pass
+
+    def purge_vm(self, vm_identifier=None):
+        pass
 
 
 if __name__ == '__main__':

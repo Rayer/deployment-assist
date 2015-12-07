@@ -160,6 +160,14 @@ def get_vm_list():
     return ret
 
 
+def get_host_mem_stats():
+    ret_list = subprocess.check_output(['virsh', 'nodememstats']).splitlines()
+    ret = {}
+    for seq in ret_list:
+        pair = seq.split(':')
+        ret[pair[0].strip()] = pair[1].strip()
+    return ret
+
 def del_vm(vm_name):
     vm_list = Utilities.get_vm_list()
     vm_exist = False
