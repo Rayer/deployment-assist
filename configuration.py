@@ -9,6 +9,7 @@ symbolic_link_map = (
     ('version_check.py', '/usr/bin/version_check'),
     ('sesame2.py', '/usr/bin/sesame2'),
     ('vmmanage.py', '/usr/bin/vmmanage')
+    ('vmcluster.py', '/usr/bin/vmcluster')
 )
 
 # This section indicates which application should be started
