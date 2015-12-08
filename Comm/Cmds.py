@@ -19,7 +19,7 @@ class GetVMList:
         return Utilities.get_vm_list()
 
 
-class GetVMStat:
+class GetKVMHostStat:
 
     def __init__(self):
         pass
@@ -29,19 +29,21 @@ class GetVMStat:
 
     @staticmethod
     def handle_payload(recv_payload=None):
-        return Utilities.get_vm_list()
+        return Utilities.get_host_stats()
 
 
-class GetVMNameState:
+class RequestSesame2:
 
-    vm_name = ''
-    def __init__(self, vm_name):
-        self.vm_name
+    serial = ''
+
+    def __init__(self, serial):
+        self.serial = serial
+        pass
 
     def broadcast_payload(self):
-        return {'vm_name': self.vm_name} # No additional payload required
+        return {'serial': self.serial}  # No additional payload required
 
     @staticmethod
     def handle_payload(recv_payload=None):
-        return Utilities.get_vm_status(recv_payload['vm_name'])
+        return Utilities.get_sesame2(recv_payload['serial'])
 

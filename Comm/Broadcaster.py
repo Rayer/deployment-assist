@@ -15,8 +15,8 @@ Periodically broadcast request, and responser will response request
 class Broadcaster:
 
     # def_broadcast_addr = '10.2.255.255'
-    def_broadcast_addr = '172.17.61.255'
-    # def_broadcast_addr = '255.255.255.255'
+    # def_broadcast_addr = '172.17.61.255'
+    def_broadcast_addr = '255.255.255.255'
     def_buffersize = 4096
     def_timeout = 1
 
