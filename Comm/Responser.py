@@ -2,6 +2,7 @@ from socket import *
 import json
 import Comm.CommConfig
 import Comm.Cmds
+from Comm import Cmds
 import traceback
 
 __author__ = 'rayer'
