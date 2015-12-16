@@ -93,12 +93,13 @@ Installation start. If it asks root password, please consider adding your public
 
     # scp files to server
     cmd = 'scp %s root@%s:/tmp/'
-    param = {'name': name, 'ip': target_kvm, 'kernel': kernel_path, 'img': img_path, 'extra': extra_options}
+    param = {'name': name, 'ip': target_kvm, 'kernel': kernel_path, 'img': img_path,
+             'extra': extra_options, 'type': scg_type}
 
     scp_kernel_cmd = 'scp %(kernel)s root@%(ip)s:/tmp/%(name)s_vmlinuz' % param
-    scp_image_cmd = 'scp %(img)s root@%(ip)s:/tmp/%(name)s_scg.img' % param
-    ssh_cmd = 'ssh root@%(ip)s -C \'cd /tmp;deploy %(name)s --private -t scg --kernel_path /tmp/%(name)s_vmlinuz \
-        --image_path /tmp/%(name)s_scg.img %(extra)s\'' % param
+    scp_image_cmd = 'scp %(img)s root@%(ip)s:/tmp/%(name)s_%(type)s.img' % param
+    ssh_cmd = 'ssh root@%(ip)s -C \'cd /tmp;deploy %(name)s --private -t %(type)s --kernel_path /tmp/%(name)s_vmlinuz \
+        --image_path /tmp/%(name)s_%(type)s.img %(extra)s -f \'' % param
 
     cmd_list = (scp_kernel_cmd, scp_image_cmd, ssh_cmd)
     for cmd in cmd_list:

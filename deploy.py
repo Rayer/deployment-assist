@@ -37,6 +37,7 @@ if __name__ == '__main__':
     parser.add_argument('-i', '--interactive', help='Interactive mode, all other argument will be ignored!', action='store_true')
     parser.add_argument('-6', '--ipv6', help='Active IPV6', action='store_true')
     parser.add_argument('-1', '--stage1_only', help='Only download/install SCG, don\'t do automation setup', action='store_true')
+    parser.add_argument('-f', '--force', help='Delete conflict VMs on sight without prompt', action='store_true')
 
     parser.add_argument('--private', help='Private Build', action='store_true')
     parser.add_argument('--kernel_path', help='Private build kernel location', dest='kernel_path', default='')
@@ -54,14 +55,17 @@ if __name__ == '__main__':
     # Check if file exist :
     will_delete_old_vm = False
     if Utilities.get_vm_status(args.name) is not None:
-        while True:
-            choice = raw_input(
-                'VM Name %s exists! Proceed will cause it being deleted, are your sure (y/N):' % args.name)
-            if choice == 'n':
-                exit(0)
-            elif choice == 'y':
-                will_delete_old_vm = True
-                break
+        if args.force:
+            will_delete_old_vm = True
+        else:
+            while True:
+                choice = raw_input(
+                    'VM Name %s exists! Proceed will cause it being deleted, are your sure (y/N):' % args.name)
+                if choice == 'n':
+                    exit(0)
+                elif choice == 'y':
+                    will_delete_old_vm = True
+                    break
 
     # args.private = False
     if args.interactive:
