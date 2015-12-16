@@ -24,6 +24,8 @@ class Automation:
             self.execute_vscg()
         elif self.type == 'scg':
             self.execute_scg()
+        elif self.type == 'scge':
+            self.execute_scge()
         else:
             print('Not support type %s yet!' % self.type)
             print('Wait 60 sec for ipxe down...')
@@ -40,29 +42,18 @@ class Automation:
     '''
 
     def execute_scg(self):
-        timer = constant.scg_installation_wait_time
-        print('Waiting for installation completed...')
-        print('Start \'virsh-console\' in %d sec' % timer)
-        self.__prompt_pause(timer)
 
-        print('\nStarting Virsh.....')
-        # system('virsh start %s' % self.name)
-
-        while subprocess.call(['virsh', 'start', self.name]) != 0:
-            print('Domain %s seems still in installation process, wait for another 30 sec' % self.name)
-            self.__prompt_pause(30)
-
-        # After stage 1 completed, turn off iPXE server
-        print('Shutting down embedded iPXE Server....')
-        ipxe_server.cleanup_ipxe_thread()
+        self.__handle_scg_stage1()
 
         c = pexpect.spawn('virsh console %s' % self.name, timeout=1000)
         c.logfile = sys.stdout
         c.setecho(False)
 
         self.__do_scg_login(c, 'admin', 'admin')
+
         c.expect('#')
         c.sendline('rbd Gallus SCG200 00000089 11:22:33:88:44:22 32 ruckus')
+
         c.expect('#')
         c.sendline('setup')
 
@@ -172,6 +163,85 @@ class Automation:
         # TODO : Requires a callback hook
 
         # TODO : Modify /opt/ruckuswireless/wsg/cli/conf/cassandra.yaml
+
+    def execute_scge(self):
+
+        self.__handle_scg_stage1()
+
+        c = pexpect.spawn('virsh console %s' % self.name, timeout=1000)
+        c.logfile = sys.stdout
+        c.setecho(False)
+
+        self.__do_scg_login(c, 'admin', 'admin')
+        c.expect('#')
+        c.sendline('rbd Gallus SZ124 00000089 11:22:33:88:44:22 32 ruckus')
+        c.expect('#')
+        c.sendline('setup')
+
+        # Have yet supported IPV6 for SCGE
+        # c.expect(['Select address type'])
+        # if self.ipv6:
+        #     c.sendline('2')
+        # else:
+        #     c.sendline('1')
+
+        # IPv4, management
+
+        # Support 1 group only for now
+        c.expect(['Port Grouping Configuration'])
+        c.sendline('1')
+
+        c.expect(['Select IP configuration'])
+        c.sendline('2')
+        c.expect(['Are these correct'])
+        c.sendline('y')
+
+        c.expect(['Primary'])
+        c.sendline('8.8.8.8')
+        c.sendline('8.8.4.4')
+
+        # Prior from 3.1, it doesn't have this
+        c.expect(['Control NAT', pexpect.TIMEOUT], timeout=12)
+        c.sendline('')
+
+        c.expect('an exist cluster')
+        c.sendline('c')
+        c.expect('Cluster Name')
+        c.sendline(Utilities.convert_blade_preferred_characters(self.name))
+        c.expect('Controller Description:')
+        c.sendline('Automatic installed %s' % self.name)
+        c.expect('Are these correct')
+        c.sendline('y')
+        c.expect('Enter the controller name of the blade')
+        c.sendline('%s-C' % Utilities.convert_blade_preferred_characters(self.name))
+
+        # Sometimes NTP Server can't be reached...
+        c.expect('NTP Server ')
+        c.sendline('')
+
+        index = c.expect(['Cannot synchronize', 'APs automatically'])
+        if index == 0:
+            c.sendline('')
+            c.sendline('')
+            c.sendline('')
+            c.expect('APs automatically')
+        else:
+            pass
+
+        c.sendline('n')
+        c.expect('Enter admin password:')
+        c.sendline('admin!234')
+        c.sendline('admin!234')
+        c.sendline('admin!234')
+        c.sendline('admin!234')
+
+        c.expect('Please login again.', timeout=1200)
+        print('Installation finished!')
+        c.sendline('')
+
+        self.__do_scg_login(c, 'admin', 'admin!234')
+        # self.__do_sesame2(c)
+        c.sendline('exit')
 
     def execute_vscg(self):
         print('Executing VSCG Automatic Setup....')
@@ -333,3 +403,20 @@ class Automation:
             sys.stdout.flush()
             timer -= 1
         print('Time up!')
+
+    def __handle_scg_stage1(self):
+        timer = constant.scg_installation_wait_time
+        print('Waiting for installation completed...')
+        print('Start \'virsh-console\' in %d sec' % timer)
+        self.__prompt_pause(timer)
+
+        print('\nStarting Virsh.....')
+        # system('virsh start %s' % self.name)
+
+        while subprocess.call(['virsh', 'start', self.name]) != 0:
+            print('Domain %s seems still in installation process, wait for another 30 sec' % self.name)
+            self.__prompt_pause(30)
+
+        # After stage 1 completed, turn off iPXE server
+        print('Shutting down embedded iPXE Server....')
+        ipxe_server.cleanup_ipxe_thread()

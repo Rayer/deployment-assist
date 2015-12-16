@@ -10,6 +10,7 @@ from FileLoader import FileLoader
 from ScriptFactory import ScriptFactory
 from interactive import InteractiveShell
 import time
+import traceback
 
 __author__ = 'rayer'
 
@@ -32,7 +33,7 @@ if __name__ == '__main__':
     parser.add_argument('-t', '--type', choices=['scg', 'scge', 'vscg'], help='target SCG type', default='vscg', dest='type')
     parser.add_argument('-b', '--branch', choices=supported_version, help='Target branch', default='ml', dest='branch')
     parser.add_argument('-B', '--build', help='Target Build Number', default='710', dest='build')
-    parser.add_argument('-N', '--nic', choices=['1', '3'], help='NIC Count', default='3', dest='nic')
+    parser.add_argument('-n', '--nic', choices=[1, 3], help='NIC Count', type=int, default='3', dest='nic')
     parser.add_argument('-i', '--interactive', help='Interactive mode, all other argument will be ignored!', action='store_true')
     parser.add_argument('-6', '--ipv6', help='Active IPV6', action='store_true')
     parser.add_argument('-1', '--stage1_only', help='Only download/install SCG, don\'t do automation setup', action='store_true')
@@ -55,7 +56,7 @@ if __name__ == '__main__':
     if Utilities.get_vm_status(args.name) is not None:
         while True:
             choice = raw_input(
-                'VM Name %s exists! Proceed will cause it being deleted, are your srue(y/N):' % args.name)
+                'VM Name %s exists! Proceed will cause it being deleted, are your sure (y/N):' % args.name)
             if choice == 'n':
                 exit(0)
             elif choice == 'y':
@@ -88,7 +89,7 @@ if __name__ == '__main__':
             f.execute_customized(args.type, args.name, args.image_path, args.kernel_path)
         else:
             f.execute_jenkins(args.type, args.name, args.branch, args.build)
-        cmd = ScriptFactory.create(args.type, args.name, 3, f.qcow_path, f.scg_image_path, f.kernel_path).generate()
+        cmd = ScriptFactory.create(args.type, args.name, args.nic, f.qcow_path, f.scg_image_path, f.kernel_path).generate()
         print('executing command : %s' % cmd)
 
         if args.type != 'vscg':
@@ -110,6 +111,7 @@ if __name__ == '__main__':
 
     except Exception as e:
         print(e.message)
+        traceback.print_exc()
     finally:
         print('Cleanup for ipxe server....')
         ipxe_server.cleanup_ipxe_thread()
