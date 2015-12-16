@@ -33,7 +33,7 @@ if __name__ == '__main__':
     parser.add_argument('-t', '--type', choices=['scg', 'scge', 'vscg'], help='target SCG type', default='vscg', dest='type')
     parser.add_argument('-b', '--branch', choices=supported_version, help='Target branch', default='ml', dest='branch')
     parser.add_argument('-B', '--build', help='Target Build Number', default='710', dest='build')
-    parser.add_argument('-n', '--nic', choices=[1, 3], help='NIC Count', type=int, default='3', dest='nic')
+    # parser.add_argument('-n', '--nic', choices=[1, 3], help='NIC Count', type=int, default='3', dest='nic')
     parser.add_argument('-i', '--interactive', help='Interactive mode, all other argument will be ignored!', action='store_true')
     parser.add_argument('-6', '--ipv6', help='Active IPV6', action='store_true')
     parser.add_argument('-1', '--stage1_only', help='Only download/install SCG, don\'t do automation setup', action='store_true')
@@ -67,6 +67,7 @@ if __name__ == '__main__':
                     will_delete_old_vm = True
                     break
 
+    args.nic = 1 if args.type == 'scge' else 3
     # args.private = False
     if args.interactive:
         InteractiveShell(args).execute()
