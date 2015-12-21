@@ -7,10 +7,11 @@ if __name__ == '__main__':
 
     print('''
     Welcome to Deploy Assist Private Build Utility!
-    Please be noted that this application currently only support SCG(SCG200)
+    Please be noted that this application currently only support SCG/SZ100(1nic profile)
 
     ''')
     name = raw_input('VM Name:')
+
     defImage = None
     while True:
         # Find if current directory contains a .img file
@@ -30,6 +31,12 @@ if __name__ == '__main__':
             continue
         break
 
+    scg_type_list = ('scg', 'scge')
+
+    defTarget = 'scg'
+    if img_path.startswith('scge'):
+        defTarget = 'scge'
+
     defKernel = None
     while True:
         defKernel = os.path.dirname(img_path) + 'vmlinuz'
@@ -46,10 +53,22 @@ if __name__ == '__main__':
             print('Invalid kernel path!')
             continue
 
+    while True:
+        scg_type = raw_input('Image type (scg/scge) [%s]:' % defTarget)
+        if scg_type == '':
+            scg_type = defTarget
+
+        if scg_type not in scg_type_list:
+            print('Invalid SCG type!')
+            continue
+        else:
+            break
+
+
     extra_options = raw_input('Extra options(Please leave it blank if you don\'t know what it is):')
 
     vm_map = (
-        ('KVM01', '172.17.60.92'),
+        ('KVM01', '172.17.61.127'),
         ('KVM02', '172.17.60.85'),
         ('KVM03', '172.17.60.94'),
     )
@@ -74,12 +93,13 @@ Installation start. If it asks root password, please consider adding your public
 
     # scp files to server
     cmd = 'scp %s root@%s:/tmp/'
-    param = {'name': name, 'ip': target_kvm, 'kernel': kernel_path, 'img': img_path, 'extra': extra_options}
+    param = {'name': name, 'ip': target_kvm, 'kernel': kernel_path, 'img': img_path,
+             'extra': extra_options, 'type': scg_type}
 
     scp_kernel_cmd = 'scp %(kernel)s root@%(ip)s:/tmp/%(name)s_vmlinuz' % param
-    scp_image_cmd = 'scp %(img)s root@%(ip)s:/tmp/%(name)s_scg.img' % param
-    ssh_cmd = 'ssh root@%(ip)s -C \'cd /tmp;deploy %(name)s --private -t scg --kernel_path /tmp/%(name)s_vmlinuz \
-        --image_path /tmp/%(name)s_scg.img %(extra)s\'' % param
+    scp_image_cmd = 'scp %(img)s root@%(ip)s:/tmp/%(name)s_%(type)s.img' % param
+    ssh_cmd = 'ssh root@%(ip)s -C \'cd /tmp;deploy %(name)s --private -t %(type)s --kernel_path /tmp/%(name)s_vmlinuz \
+        --image_path /tmp/%(name)s_%(type)s.img %(extra)s -f \'' % param
 
     cmd_list = (scp_kernel_cmd, scp_image_cmd, ssh_cmd)
     for cmd in cmd_list:
