@@ -37,7 +37,7 @@ class ScriptFactory:
             return ScriptFactory._create_vscg_factory(name, nic_count, storage_path)
 
     def _gen_basic_script(self, name):
-        self.output += 'virt-install --name %s --ram 16384 --vcpus=8 --os-type=linux --os-variant=rhel6 --vnc --wait 0' % name
+        self.output += 'virt-install --name %s --ram 16384 --vcpus=8 --os-type=linux --os-variant=rhel6 --vnc --wait 0 ' % name
 
     # will done file operations before generating the script
     def _gen_scg_template(self, name, storage_path, kernel_path, image_path):
