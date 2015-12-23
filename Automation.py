@@ -420,8 +420,6 @@ class Automation:
         print('\nStarting Virsh.....')
         # system('virsh start %s' % self.name)
 
-
-
         while subprocess.call(['virsh', 'start', self.name]) != 0:
             print('Domain %s seems still in installation process, wait for another 30 sec' % self.name)
             self.__prompt_pause(30)
