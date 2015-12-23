@@ -3,6 +3,8 @@ import sys
 import time
 
 import pexpect
+import xml.etree.ElementTree as ET
+import os
 
 import Utilities
 import constant
@@ -405,6 +407,11 @@ class Automation:
         print('Time up!')
 
     def __handle_scg_stage1(self):
+
+        if self.type == 'scge':
+            print('installation type is SCGE, patching network interface defination...')
+            self.__patch_scge_nic()
+
         timer = constant.scg_installation_wait_time
         print('Waiting for installation completed...')
         print('Start \'virsh-console\' in %d sec' % timer)
@@ -413,6 +420,8 @@ class Automation:
         print('\nStarting Virsh.....')
         # system('virsh start %s' % self.name)
 
+
+
         while subprocess.call(['virsh', 'start', self.name]) != 0:
             print('Domain %s seems still in installation process, wait for another 30 sec' % self.name)
             self.__prompt_pause(30)
@@ -420,3 +429,24 @@ class Automation:
         # After stage 1 completed, turn off iPXE server
         print('Shutting down embedded iPXE Server....')
         ipxe_server.cleanup_ipxe_thread()
+
+    def __patch_scge_nic(self):
+        config = subprocess.check_output(['virsh', 'dumpxml', self.name])
+        tree = ET.fromstring(config)
+
+        # Need to do twice, dunno why...
+        for interface in tree.iter('interface'):
+            if interface.find('source').attrib['bridge'] == 'bridge1':
+                tree.find('devices').remove(interface)
+
+        for interface in tree.iter('interface'):
+            if interface.find('source').attrib['bridge'] == 'bridge1':
+                tree.find('devices').remove(interface)
+
+        # Write code to /tmp/<DomainName>
+        file_name = '/tmp/%s.xml' % self.name
+        with open(file_name, 'w') as conf_file:
+            conf_file.write(ET.tostring(tree))
+
+        print(subprocess.check_output(['virsh', 'define', file_name]))
+        os.remove(file_name)

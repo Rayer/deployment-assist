@@ -67,7 +67,8 @@ if __name__ == '__main__':
                     will_delete_old_vm = True
                     break
 
-    args.nic = 1 if args.type == 'scge' else 3
+    # args.nic = 1 if args.type == 'scge' else 3
+    args.nic = 3
     # args.private = False
     if args.interactive:
         InteractiveShell(args).execute()
