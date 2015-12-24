@@ -11,6 +11,7 @@ from ScriptFactory import ScriptFactory
 from interactive import InteractiveShell
 import time
 import traceback
+import sys
 
 __author__ = 'rayer'
 
@@ -24,8 +25,9 @@ __author__ = 'rayer'
 
     For branch mapping, it will be described in constant.py
 '''
-if __name__ == '__main__':
 
+
+def deploy(argv):
     supported_version = Utilities.get_supported_branches()
 
     parser = argparse.ArgumentParser(description='SCG Deploy Utility. Current only supports scg/vscg')
@@ -43,7 +45,7 @@ if __name__ == '__main__':
     parser.add_argument('--kernel_path', help='Private build kernel location', dest='kernel_path', default='')
     parser.add_argument('--image_path', help='Private build image location', dest='image_path', default='')
 
-    args = parser.parse_args()
+    args = parser.parse_args(argv)
 
     # Check private build arguments
     # if args.private:
@@ -86,7 +88,7 @@ if __name__ == '__main__':
     print('Target Build : %s' % args.build)
     print('NIC Count : %s' % args.nic)
 
-    version = args.build
+    # version = args.build
 
     try:
 
@@ -121,3 +123,7 @@ if __name__ == '__main__':
     finally:
         print('Cleanup for ipxe server....')
         ipxe_server.cleanup_ipxe_thread()
+
+
+if __name__ == '__main__':
+    deploy(sys.argv[1:])

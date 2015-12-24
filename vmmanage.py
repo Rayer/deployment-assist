@@ -2,6 +2,7 @@
 import argparse
 import sys
 import Utilities
+import deploy
 
 __author__ = 'rayer'
 
@@ -47,6 +48,13 @@ class VMManage:
             Utilities.del_vm(in_vm_name)
             check = True
 
+    def create_vm(self, vm_name=None):
+
+        if vm_name is None:
+            vm_name = raw_input('VM Name : ')
+
+        deploy.deploy([vm_name, '-i'])
+
 
 if __name__ == '__main__':
 
@@ -64,3 +72,6 @@ if __name__ == '__main__':
 
     if args.command == 'delete':
         v.delete_vm(args.vm_name)
+
+    if args.command == 'create':
+        v.create_vm(args.vm_name)
