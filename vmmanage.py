@@ -59,7 +59,7 @@ class VMManage:
 if __name__ == '__main__':
 
     parser = argparse.ArgumentParser(description='VM Customized Manager Wrapper')
-    parser.add_argument('command', metavar='command', choices=['show', 'create', 'delete', 'setup'], help='Commands : show, create, delete, syslink')
+    parser.add_argument('command', metavar='command', choices=['show', 'create', 'delete', 'setup'], help='Commands : show, create, delete, setup')
     parser.add_argument('vm_name', metavar='vm_name', nargs='?', help='VM Name', default=None)
     args = parser.parse_args()
     v = VMManage()
