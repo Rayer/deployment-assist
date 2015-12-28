@@ -191,6 +191,35 @@ def del_vm(vm_name):
         raise Exception('VM %(vm_name)s is not exist!' % {'vm_name': vm_name})
 
 
+def start_vm(vm_name):
+    vm_list = Utilities.get_vm_list()
+    # if in running, throw error message
+    for vm_info in vm_list['running']:
+        if vm_name == vm_info['name']:
+            raise ValueError('VM %s already in running state!' % vm_name)
+
+    for name in vm_list['shutdown']:
+        if name == vm_name:
+            os.system('virsh start %s' % vm_name)
+            return
+
+    raise ValueError('Can\'t find VM %s !' % vm_name)
+
+
+def stop_vm(vm_name):
+    vm_list = Utilities.get_vm_list()
+    for vm_info in vm_list['running']:
+        if vm_name == vm_info['id'] or vm_name == vm_info['name']:
+            os.system('virsh destroy %s' % vm_info['name'])
+            return
+
+    for name in vm_list['stop']:
+        if name == vm_name:
+            raise ValueError('VM %s is already stopped!')
+
+    raise ValueError('VM %s is not found!')
+
+
 def get_vm_status(vm_name):
     vm_list = Utilities.get_vm_list()
 

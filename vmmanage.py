@@ -55,11 +55,42 @@ class VMManage:
 
         deploy.deploy([vm_name, '-i'])
 
+    def start_vm(self, vm_name=None):
+        if vm_name is not None:
+            Utilities.start_vm(vm_name)
+            return
+
+        vm_list = Utilities.get_vm_list()
+
+        count = 0
+        for vm in vm_list['shutdown']:
+            print('(%2d)%s' % (count, vm))
+            count += 1
+
+        choice = raw_input('Choice : ')
+        Utilities.start_vm(vm_list['shutdown'][int(choice)])
+
+    def stop_vm(self, vm_name=None):
+        if vm_name is not None:
+            Utilities.stop_vm(vm_name)
+            return
+
+        vm_list = Utilities.get_vm_list()
+
+        count = 0
+        for vm in vm_list['running']:
+            print('(%2d)%s' % (count, vm['name']))
+            count += 1
+
+        choice = raw_input('Choice : ')
+        Utilities.stop_vm(vm_list['running'][int(choice)]['name'])
+
 
 if __name__ == '__main__':
 
     parser = argparse.ArgumentParser(description='VM Customized Manager Wrapper')
-    parser.add_argument('command', metavar='command', choices=['show', 'create', 'delete', 'setup'], help='Commands : show, create, delete, setup')
+    parser.add_argument('command', metavar='command', choices=['show', 'create', 'delete', 'setup', 'stop', 'start'],
+                        help='Commands : show, create, delete, setup, start, stop')
     parser.add_argument('vm_name', metavar='vm_name', nargs='?', help='VM Name', default=None)
     args = parser.parse_args()
     v = VMManage()
@@ -75,3 +106,9 @@ if __name__ == '__main__':
 
     if args.command == 'create':
         v.create_vm(args.vm_name)
+
+    if args.command == 'start':
+        v.start_vm(args.vm_name)
+
+    if args.command == 'stop':
+        v.stop_vm(args.vm_name)
