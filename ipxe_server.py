@@ -16,6 +16,7 @@ from SimpleHTTPServer import SimpleHTTPRequestHandler
 from SocketServer import TCPServer
 from threading import Thread
 import ipxe_server
+import subprocess
 
 TCPServer.allow_reuse_address = True
 
@@ -115,6 +116,9 @@ def create_ipxe_thread():
         def stop(self):
             self.httpd.shutdown()
 
+    # remove firewall policy
+    print('Removing firewall policy')
+    subprocess.check_output(['iptables', '--flush'])
     ipxe_server.ipxe_server_thread = IpxeServer()
     ipxe_server.ipxe_server_thread.start()
 
