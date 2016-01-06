@@ -67,3 +67,6 @@ build/
 
 ## Python pyc file
 *.pyc
+
+## Misc
+nohup.out
