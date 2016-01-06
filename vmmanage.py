@@ -1,6 +1,7 @@
 #!/usr/bin/python
 import argparse
 import sys
+
 import Utilities
 import deploy
 
@@ -23,8 +24,9 @@ class VMManage:
             print('%s' % offline)
         print('')
 
-    def do_syslink(self):
+    def do_setup(self):
         Utilities.setup_system_symbolic_links(sys.argv[0])
+        Utilities.execute_setup_scripts(sys.argv[0])
 
     def delete_vm(self, vm_name=None):
 
@@ -99,7 +101,7 @@ if __name__ == '__main__':
         v.show_vms()
 
     if args.command == 'setup':
-        v.do_syslink()
+        v.do_setup()
 
     if args.command == 'delete':
         v.delete_vm(args.vm_name)

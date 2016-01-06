@@ -6,7 +6,6 @@ import urllib2
 
 from BeautifulSoup import BeautifulSoup
 
-import Utilities
 import configuration
 import constant
 
@@ -18,7 +17,7 @@ def __get_master():
 
 
 def __get_branch(branch_name):
-    return Utilities.__get_branches_raw().get(branch_name)
+    return __get_branches_raw().get(branch_name)
 
 
 def __get_branches_raw():
@@ -26,49 +25,49 @@ def __get_branches_raw():
 
 
 def __get_root(branch, variant):
-    return Utilities.__get_variant(branch, variant).get('root')
+    return __get_variant(branch, variant).get('root')
 
 
 def __get_variants_raw(branch):
-    return Utilities.__get_branch(branch).get('variants')
+    return __get_branch(branch).get('variants')
 
 
 def __get_variant(branch, variant):
-    return Utilities.__get_variants_raw(branch).get(variant)
+    return __get_variants_raw(branch).get(variant)
 
 
 def __get_version_string(branch):
-    return Utilities.__get_branch(branch).get('version')
+    return __get_branch(branch).get('version')
 
 
 def get_branch_version_indicator(branch):
-    return Utilities.__get_version_string(branch).replace('{$build}', '*')
+    return __get_version_string(branch).replace('{$build}', '*')
 
 
 def get_supported_branches():
-    return Utilities.__get_branches_raw().keys()
+    return __get_branches_raw().keys()
 
 
 def get_branch_supported_scg_type(branch):
-    return Utilities.__get_variants_raw(branch).keys()
+    return __get_variants_raw(branch).keys()
 
 
 def __get_file_path_raw(branch, variant, file_type):
-    return Utilities.__get_variant(branch, variant).get(file_type)
+    return __get_variant(branch, variant).get(file_type)
 
 
 def get_file_path(branch, variant, file_type, build):
     # extend root first
-    return Utilities.__get_file_path_raw(branch, variant, file_type) \
-        .replace('{$root}', Utilities.__get_root(branch, variant)) \
-        .replace('{$version}', Utilities.__get_version_string(branch)) \
+    return __get_file_path_raw(branch, variant, file_type) \
+        .replace('{$root}', __get_root(branch, variant)) \
+        .replace('{$version}', __get_version_string(branch)) \
         .replace('{$build}', build) \
-        .replace('{$master}', Utilities.__get_master())
+        .replace('{$master}', __get_master())
 
 
 def get_root_path(branch, scg_type):
     raw = constant.resource_map.get('branches').get(branch).get('variants').get(scg_type).get('root')
-    return raw.replace('{$master}', Utilities.__get_master())
+    return raw.replace('{$master}', __get_master())
 
 
 def convert_blade_preferred_characters(origin):
@@ -86,11 +85,11 @@ def convert_blade_preferred_characters(origin):
 # TODO: Extract these 2 methods
 
 def get_branch_versions(branch, variant):
-    target_url = Utilities.get_root_path(branch, variant)
+    target_url = get_root_path(branch, variant)
     result = urllib2.urlopen(target_url)
     soup = BeautifulSoup(result)
     ret = []
-    version_pattern_raw = Utilities.__get_version_string(branch).replace('.', '\.').replace('{$build}', '\d')
+    version_pattern_raw = __get_version_string(branch).replace('.', '\.').replace('{$build}', '\d')
     version_pattern = re.compile(version_pattern_raw)
     for element in soup.findAll('a'):
         if version_pattern.match(element.text):
@@ -101,11 +100,11 @@ def get_branch_versions(branch, variant):
 
 
 def get_branch_download_dirs(branch, variant):
-    target_url = Utilities.get_root_path(branch, variant)
+    target_url = get_root_path(branch, variant)
     result = urllib2.urlopen(target_url)
     soup = BeautifulSoup(result)
     ret = []
-    version_pattern_raw = Utilities.__get_version_string(branch).replace('.', '\.').replace('{$build}', '\d')
+    version_pattern_raw = __get_version_string(branch).replace('.', '\.').replace('{$build}', '\d')
     version_pattern = re.compile(version_pattern_raw)
     for element in soup.findAll('a'):
         if version_pattern.match(element.text):
@@ -135,6 +134,14 @@ def setup_system_symbolic_links(script_bin_path):
 
         os.symlink(os.path.dirname(rp) + '/' + source, target)
 
+
+def execute_setup_scripts(script_bin_path):
+    rp = os.path.realpath(script_bin_path)
+    for (cmd, daemonized) in configuration.init_exec:
+        if daemonized:
+            os.system('nohup python %s &' % (os.path.dirname(rp) + '/' + cmd))
+        else:
+            os.system('python %s' % os.path.dirname(rp) + '/' + cmd)
 
 '''
 format :
@@ -178,7 +185,7 @@ def get_host_stats():
 
 
 def del_vm(vm_name):
-    vm_list = Utilities.get_vm_list()
+    vm_list = get_vm_list()
     vm_exist = False
 
     # if running, destroy it
@@ -186,13 +193,13 @@ def del_vm(vm_name):
         if vm_name == vm['name']:
             os.system('virsh destroy %s' % vm_name)
             vm_exist = True
-            vm_list = Utilities.get_vm_list()  # Get VM List again
+            vm_list = get_vm_list()  # Get VM List again
             break
         elif vm_name == vm['id']:
             vm_name = vm['name']
             os.system('virsh destroy %s' % vm_name)
             vm_exist = True
-            vm_list = Utilities.get_vm_list()
+            vm_list = get_vm_list()
 
     for name in vm_list['shutdown']:
         if vm_name == name:
@@ -209,7 +216,7 @@ def del_vm(vm_name):
 
 
 def start_vm(vm_name):
-    vm_list = Utilities.get_vm_list()
+    vm_list = get_vm_list()
     # if in running, throw error message
     for vm_info in vm_list['running']:
         if vm_name == vm_info['name']:
@@ -224,7 +231,7 @@ def start_vm(vm_name):
 
 
 def stop_vm(vm_name):
-    vm_list = Utilities.get_vm_list()
+    vm_list = get_vm_list()
     for vm_info in vm_list['running']:
         if vm_name == vm_info['id'] or vm_name == vm_info['name']:
             os.system('virsh destroy %s' % vm_info['name'])
@@ -238,7 +245,7 @@ def stop_vm(vm_name):
 
 
 def get_vm_status(vm_name):
-    vm_list = Utilities.get_vm_list()
+    vm_list = get_vm_list()
 
     for vm in vm_list['running']:
         if vm_name == vm['name'] or vm_name == vm['id']:

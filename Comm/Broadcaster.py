@@ -1,9 +1,11 @@
-import Comm.CommConfig
-import time
-import Cmds
 import json
+import time
 from socket import *
 from time import gmtime, strftime
+
+import Cmds
+import Comm.CommConfig
+
 __author__ = 'rayer'
 
 '''
@@ -43,7 +45,7 @@ class Broadcaster:
         return ret
 
     def broadcast(self, broadcast_cmd):
-        payload = {'request': broadcast_cmd.__module__ + '.' + broadcast_cmd.__class__.__name__,\
+        payload = {'request': broadcast_cmd.__module__ + '.' + broadcast_cmd.__class__.__name__,
                    'time': strftime("%Y-%m-%d %H:%M:%S", gmtime())}
         payload.update(broadcast_cmd.broadcast_payload())
         return self.broadcast_raw(json.dumps(payload))

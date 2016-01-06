@@ -1,13 +1,14 @@
-from socket import *
 import json
-import Comm.CommConfig
-import Comm.Cmds
-from Comm import Cmds
 import traceback
+from socket import *
+
+import Comm.Cmds
+import Comm.CommConfig
 
 __author__ = 'rayer'
 
-if __name__ == '__main__':
+
+def responser_main():
     cs = socket(AF_INET, SOCK_DGRAM)
     cs.setsockopt(SOL_SOCKET, SO_REUSEADDR, 1)
     cs.setsockopt(SOL_SOCKET, SO_BROADCAST, 1)
@@ -29,3 +30,6 @@ if __name__ == '__main__':
             print('Exception is caught!')
             traceback.print_exc()
 
+
+if __name__ == '__main__':
+    responser_main()

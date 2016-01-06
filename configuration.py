@@ -9,11 +9,13 @@ symbolic_link_map = (
     ('version_list.py', '/usr/bin/version_list'),
     ('sesame2.py', '/usr/bin/sesame2'),
     ('vmmanage.py', '/usr/bin/vmmanage'),
-    ('vmcluster.py', '/usr/bin/vmcluster')
+    ('vmcluster.py', '/usr/bin/vmcluster'),
     ('deploy_private.py', '/usr/bin/deploy_private')
 
 )
 
 # This section indicates which application should be started
+# First one is command, second one is demonized or not(will be run as 'nohup <app> &'
 init_exec = (
+    ('comm_server.py', True),
 )
