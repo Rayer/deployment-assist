@@ -7,7 +7,7 @@ __author__ = 'rayer'
 
 if __name__ == '__main__':
     pid = str(os.getpid())
-    pidfile = '/tmp/comm_server.pid'
+    pidfile = '/var/run/comm_server.pid'
 
     if os.path.isfile(pidfile):
         with open(pidfile, 'r') as file:
