@@ -2,9 +2,10 @@
 import argparse
 import re
 
+import Comm.CommConfig
 from Comm.Broadcaster import Broadcaster
 from Comm.Cmds import *
-import Comm.CommConfig
+
 __author__ = 'rayer'
 
 
@@ -16,9 +17,12 @@ class CmdHandler:
         server_info_list = self.broadcaster.broadcast(GetVMList())
         for server_info in server_info_list:
             if not vm_detail:
-                print('KVM : %s\tOnline:%d\tOffline:%d' % (server_info[1][0], server_info[0]['running'].__len__(), server_info[0]['shutdown'].__len__()))
+                print('%s(%s)\tOnline:%d\tOffline:%d' % (
+                server_info[0]['name'], server_info[1][0], server_info[0]['running'].__len__(),
+                server_info[0]['shutdown'].__len__()))
                 continue
             # prepare detail
+            print('KVM Name : %s' % server_info[0]['name'])
             print('KVM IP : %s' % server_info[1][0])
             print('Running VMs Count : %d' % server_info[0]['running'].__len__())
             for running in server_info[0]['running']:
