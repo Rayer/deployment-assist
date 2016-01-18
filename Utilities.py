@@ -1,6 +1,7 @@
 import httplib
 import os
 import re
+import socket
 import subprocess
 import urllib2
 
@@ -152,7 +153,7 @@ format :
 
 def get_vm_list():
     ret_list = subprocess.check_output(['virsh', 'list', '--all']).splitlines()
-    ret = {'running': [], 'shutdown': []}
+    ret = {'name': socket.gethostname(), 'running': [], 'shutdown': []}
     for seq in ret_list[2:]:  # Pass first two lines
         data = seq.split()
 

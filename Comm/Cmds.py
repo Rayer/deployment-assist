@@ -1,6 +1,6 @@
 import Utilities
-import sys
 __author__ = 'rayer'
+
 
 def get_cmd_list():
     pass
