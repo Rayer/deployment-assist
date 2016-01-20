@@ -1,4 +1,7 @@
+import subprocess
+
 import Utilities
+
 __author__ = 'rayer'
 
 
@@ -47,3 +50,14 @@ class RequestSesame2:
     def handle_payload(recv_payload=None):
         return Utilities.get_sesame2(recv_payload['serial'])
 
+
+class ExecCmd:
+    def __init__(self, cmd):
+        self.cmd = cmd
+
+    def broadcast_payload(self):
+        return {'cmd': self.cmd}
+
+    @staticmethod
+    def handle_payload(recv_payload):
+        return {'res': subprocess.check_output(recv_payload['cmd'], shell=True)}

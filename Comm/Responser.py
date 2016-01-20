@@ -24,6 +24,7 @@ def responser_main():
             eval_target = json.loads(msg).get('request') + '.handle_payload(json.loads(msg))'
             print(eval_target)
             ret = eval(eval_target)
+            ret.update({'host': gethostname()})
             print(ret)
             cs.sendto(json.dumps(ret), b_from)
         except BaseException as be:
