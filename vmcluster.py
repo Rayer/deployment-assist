@@ -15,7 +15,7 @@ class CmdHandler:
 
     def discovery(self, vm_detail=False, host_ip=None):
         server_info_list = self.broadcaster.broadcast(GetVMList())
-        print(server_info_list)
+        # print(server_info_list)
         for server_info in server_info_list:
             if not vm_detail:
                 print('%s(%s)\tOnline:%d\tOffline:%d' % (
@@ -23,7 +23,7 @@ class CmdHandler:
                     server_info[0]['shutdown'].__len__()))
                 continue
             # prepare detail
-            print('KVM Name : %s' % server_info[0]['name'])
+            print('KVM Name : %s' % server_info[0].get('host', 'None'))
             print('KVM IP : %s' % server_info[1][0])
             print('Running VMs Count : %d' % server_info[0]['running'].__len__())
             for running in server_info[0]['running']:
