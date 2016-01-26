@@ -25,6 +25,26 @@ resource_map = {
                     'image': '{$root}/{$version}/vscg-{$version}.qcow2'
                 }}
         },
+        'sz3.5-gui': {
+            'version': '3.5.0.0.{$build}',
+            # scge/3.5.0.0/installer/3.5.0.0.1/
+            'variants': {
+                'scg': {
+                    'root': '{$master}scg/3.5.0.0/installer/',
+                    'kernel': '{$root}/{$version}/vmlinuz',
+                    'image': '{$root}/{$version}/scg-installer_{$version}.img'
+                },
+                'scge': {
+                    'root': '{$master}scge/3.5.0.0/installer/',
+                    'kernel': '{$root}/{$version}/vmlinuz',
+                    'image': '{$root}/{$version}/scge-installer_{$version}.img'
+
+                },
+                'vscg': {
+                    'root': '{$master}vscg/3.5.0.0/installer/',
+                    'image': '{$root}/{$version}/vscg-{$version}.qcow2'
+                }}
+        },
         'sz3.2.1': {
             'version': '3.2.1.0.{$build}',
             'variants': {
@@ -44,44 +64,6 @@ resource_map = {
                 }
             }
         },
-        # 'sz3.4_int': {
-        #     'version': '3.4.0.0.{$build}',
-        #     'variants': {
-        #         'scg': {
-        #             'root': '{$master}scg/sz34_int/ESPP/installer/',
-        #             'kernel': '{$root}/{$version}/vmlinuz',
-        #             'image': '{$root}/{$version}/scg-installer_{$version}.img'
-        #         },
-        #         'scge': {
-        #             'root': '{$master}scge/sz34_int/ESPP/installer/',
-        #             'kernel': '{$root}/{$version}/vmlinuz',
-        #             'image': '{$root}/{$version}/scge-installer_{$version}.img'
-        #         },
-        #         'vscg': {
-        #             'root': '{$master}vscg/sz34_int/ESPP/installer/',
-        #             'image': '{$root}/{$version}/vscg-{$version}.qcow2'
-        #         }
-        #     }
-        # },
-        # 'sz3.4_rel': {
-        #     'version': '3.4.0.0.{$build}',
-        #     'variants': {
-        #         'scg': {
-        #             'root': '{$master}scg/sz34_rel/3.4.0.0/installer/',
-        #             'kernel': '{$root}/{$version}/vmlinuz',
-        #             'image': '{$root}/{$version}/scg-installer_{$version}.img'
-        #         },
-        #         'scge': {
-        #             'root': '{$master}scge/sz34_rel/3.4.0.0/installer/',
-        #             'kernel': '{$root}/{$version}/vmlinuz',
-        #             'image': '{$root}/{$version}/scge-installer_{$version}.img'
-        #         },
-        #         'vscg': {
-        #             'root': '{$master}vscg/sz34_rel/3.4.0.0/installer/',
-        #             'image': '{$root}/{$version}/vscg-{$version}.qcow2'
-        #         }
-        #     }
-        # },
         'sz3.1': {
             'version': '3.1.0.0.{$build}',
             'variants': {
