@@ -141,7 +141,6 @@ resource_map = {
             }
         }
     }
-
 }
 
 vm_storage_path = '/kvm_images/'
@@ -161,4 +160,15 @@ type_attribute = {
     'scg': {'virtual': False},
     'scge': {'virtual': False},
     'vscg': {'virtual': True}
+}
+
+scg_default_values = {
+    'name': ('Anonymous SCG', None),
+    'type': ('scg', ['scg', 'scge', 'vscg']),
+    'branch': ('ml', None),
+    'build': (1, None),
+    'nic': (3, [1, 3]),
+    'cpu': (2, range(1, 4)),
+    'memory': (16, range(7, 32)),
+    'ipv6': (False, [True, False])
 }

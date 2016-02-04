@@ -4,7 +4,6 @@ import urllib
 
 import Utilities
 import constant
-import ipxe_server
 
 __author__ = 'rayer'
 
@@ -29,8 +28,13 @@ class FileLoader:
         else:
             print('No suitable module : %s' % scg_type)
 
-    def execute_customized(self, scg_type, name, image_path, kernel_path=''):
+    def execute_customized(self, scg_profile):
         print('Customized SCG operations....')
+
+        image_path = scg_profile['image_path']
+        kernel_path = scg_profile['kernel_path']
+        scg_type = scg_profile['type']
+        name = scg_profile['name']
 
         if os.path.isfile('/tmp/target.img') or os.path.islink('/tmp/target.img'):
             os.remove('/tmp/target.img')

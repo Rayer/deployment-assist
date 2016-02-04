@@ -28,6 +28,8 @@ __author__ = 'rayer'
 '''
 
 def deploy(argv):
+    scg_profile = dict((k, v[0]) for (k, v) in scg_default_values.items())
+
     supported_version = Utilities.get_supported_branches()
 
     parser = argparse.ArgumentParser(description='SCG Deploy Utility. Current only supports scg/vscg')
@@ -42,12 +44,13 @@ def deploy(argv):
     parser.add_argument('-f', '--force', help='Delete conflict VMs on sight without prompt', action='store_true')
     parser.add_argument('-m', '--memory', help='How much memory assigned to VM', default=default_kvm_memory_allocated,
                         dest='memory', type=int)
-
     parser.add_argument('--private', help='Private Build', action='store_true')
     parser.add_argument('--kernel_path', help='Private build kernel location', dest='kernel_path', default='')
     parser.add_argument('--image_path', help='Private build image location', dest='image_path', default='')
 
     args = parser.parse_args(argv)
+
+    # Dump args into profile
 
     # Check private build arguments
     # if args.private:
@@ -83,6 +86,8 @@ def deploy(argv):
     if will_delete_old_vm:
         Utilities.del_vm(args.name)
 
+    scg_profile.update(vars(args))
+
     # Print current argument setting :
     print('VM Name : %s' % args.name)
     print('Target Model : %s' % args.type)
@@ -97,7 +102,7 @@ def deploy(argv):
 
         f = FileLoader()
         if args.private:
-            f.execute_customized(args.type, args.name, args.image_path, args.kernel_path)
+            f.execute_customized(scg_profile)
         else:
             f.execute_jenkins(args.type, args.name, args.branch, args.build)
         cmd = ScriptFactory.create(args.type, args.name, args.nic, args.memory, f.qcow_path, f.scg_image_path,
