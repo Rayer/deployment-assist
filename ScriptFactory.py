@@ -12,32 +12,34 @@ class ScriptFactory:
         pass
 
     @staticmethod
-    def _create_scg_factory(name, nic_count, storage_path, image_path, kernel_path):
+    def _create_scg_factory(name, allocated_memory, nic_count, storage_path, image_path, kernel_path):
         print('Starting creating SCG script factory, name : %s, image_path = %s, kernel_path = %s, nic = %s' % (name, image_path, kernel_path, nic_count))
         s = ScriptFactory()
-        s._gen_basic_script(name)
+        s._gen_basic_script(name, allocated_memory)
         s._gen_scg_template(name, storage_path, kernel_path, image_path)
         s._gen_nic_template(nic_count)
         return s
 
     @staticmethod
-    def _create_vscg_factory(name, nic_count, image_path):
+    def _create_vscg_factory(name, allocated_memory, nic_count, image_path):
         print('Starting creating VSCG script factory, name : %s, image_path = %s, nic = %s' % (name, image_path, nic_count))
         s = ScriptFactory()
-        s._gen_basic_script(name)
+        s._gen_basic_script(name, allocated_memory)
         s._gen_vscg_template(name)
         s._gen_nic_template(nic_count)
         return s
 
     @staticmethod
-    def create(scg_type, name, nic_count, storage_path, image_path='', kernel_path=''):
+    def create(scg_type, name, nic_count, allocated_memory, storage_path, image_path='', kernel_path=''):
         if scg_type == 'scg' or scg_type == 'scge':
-            return ScriptFactory._create_scg_factory(name, nic_count, storage_path, image_path, kernel_path)
+            return ScriptFactory._create_scg_factory(name, allocated_memory, nic_count, storage_path, image_path,
+                                                     kernel_path)
         elif scg_type == 'vscg':
-            return ScriptFactory._create_vscg_factory(name, nic_count, storage_path)
+            return ScriptFactory._create_vscg_factory(name, allocated_memory, nic_count, storage_path)
 
-    def _gen_basic_script(self, name):
-        self.output += 'virt-install --name %s --ram 16384 --vcpus=8 --os-type=linux --os-variant=rhel6 --vnc --wait 0 ' % name
+    def _gen_basic_script(self, name, allocated_memory):
+        self.output += 'virt-install --name %s --ram %d --vcpus=8 --os-type=linux --os-variant=rhel6 --vnc --wait 0 ' % (
+            name, allocated_memory * 1024)
 
     # will done file operations before generating the script
     def _gen_scg_template(self, name, storage_path, kernel_path, image_path):

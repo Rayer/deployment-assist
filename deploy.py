@@ -1,6 +1,9 @@
 #!/usr/bin/python
 import argparse
 import os
+import sys
+import time
+import traceback
 from os import system
 
 import Utilities
@@ -8,10 +11,8 @@ import ipxe_server
 from Automation import Automation
 from FileLoader import FileLoader
 from ScriptFactory import ScriptFactory
+from constant import *
 from interactive import InteractiveShell
-import time
-import traceback
-import sys
 
 __author__ = 'rayer'
 
@@ -26,7 +27,6 @@ __author__ = 'rayer'
     For branch mapping, it will be described in constant.py
 '''
 
-
 def deploy(argv):
     supported_version = Utilities.get_supported_branches()
 
@@ -40,6 +40,8 @@ def deploy(argv):
     parser.add_argument('-6', '--ipv6', help='Active IPV6', action='store_true')
     parser.add_argument('-1', '--stage1_only', help='Only download/install SCG, don\'t do automation setup', action='store_true')
     parser.add_argument('-f', '--force', help='Delete conflict VMs on sight without prompt', action='store_true')
+    parser.add_argument('-m', '--memory', help='How much memory assigned to VM', default=default_kvm_memory_allocated,
+                        dest='memory', type=int)
 
     parser.add_argument('--private', help='Private Build', action='store_true')
     parser.add_argument('--kernel_path', help='Private build kernel location', dest='kernel_path', default='')
@@ -87,6 +89,7 @@ def deploy(argv):
     print('Target Branch : %s' % args.branch)
     print('Target Build : %s' % args.build)
     print('NIC Count : %s' % args.nic)
+    print('Memory allocated : %d' % args.memory)
 
     # version = args.build
 
@@ -97,7 +100,8 @@ def deploy(argv):
             f.execute_customized(args.type, args.name, args.image_path, args.kernel_path)
         else:
             f.execute_jenkins(args.type, args.name, args.branch, args.build)
-        cmd = ScriptFactory.create(args.type, args.name, args.nic, f.qcow_path, f.scg_image_path, f.kernel_path).generate()
+        cmd = ScriptFactory.create(args.type, args.name, args.nic, args.memory, f.qcow_path, f.scg_image_path,
+                                   f.kernel_path).generate()
         print('executing command : %s' % cmd)
 
         if args.type != 'vscg':

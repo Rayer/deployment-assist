@@ -2,6 +2,7 @@ import os
 import sys
 
 import Utilities
+from constant import *
 
 __author__='rayer'
 
@@ -20,8 +21,8 @@ class InteractiveShell:
         self.__handle_branch()
         self.__handle_type()
         self.__handle_version()
+        self.__handle_memory()
         self.__handle_ipv6()
-
 
     def __handle_type(self):
         check = False
@@ -62,8 +63,8 @@ class InteractiveShell:
         while not check:
             version_input = raw_input('Enter version or \'i\' for version list : ')
             if version_input is 'i':
-                print ('Available versions for %s of %s: ' % \
-                       (self.args.type, Utilities.get_branch_version_indicator(self.args.branch)))
+                print('Available versions for %s of %s: ' %
+                      (self.args.type, Utilities.get_branch_version_indicator(self.args.branch)))
                 for build in supported_build:
                     sys.stdout.write('%d ' % build)
                 print('')
@@ -73,6 +74,19 @@ class InteractiveShell:
                     self.args.build = version_input
                 else:
                     print('Invalid build number, please input \'i\' for current build list')
+
+    def __handle_memory(self):
+        while True:
+            memory_raw = raw_input('Allocate memory [%d] : ' % default_kvm_memory_allocated)
+            if memory_raw == '':
+                memory = default_kvm_memory_allocated
+            else:
+                memory = int(memory_raw)
+
+            if memory in xrange(8, 32):
+                self.args.memory = memory
+                break
+            continue
 
     def __handle_customized_image(self):
 

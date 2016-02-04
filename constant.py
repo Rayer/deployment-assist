@@ -155,6 +155,8 @@ scg_default_serial = '00000089'
 scg_default_saseme = 'L340thQyugjQZIzY3oEOcDiXh0QVLM0Kytu@ntb4UAj5TF@qJrLhUwESKaj'
 scg_installation_wait_time = 180
 
+default_kvm_memory_allocated = 16
+
 type_attribute = {
     'scg': {'virtual': False},
     'scge': {'virtual': False},
