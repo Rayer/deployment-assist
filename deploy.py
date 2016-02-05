@@ -27,7 +27,9 @@ __author__ = 'rayer'
     For branch mapping, it will be described in constant.py
 '''
 
+
 def deploy(argv):
+    # Dump default values into SCG Profile.
     scg_profile = dict((k, v[0]) for (k, v) in scg_default_values.items())
 
     supported_version = Utilities.get_supported_branches()
@@ -49,13 +51,6 @@ def deploy(argv):
     parser.add_argument('--image_path', help='Private build image location', dest='image_path', default='')
 
     args = parser.parse_args(argv)
-
-    # Dump args into profile
-
-    # Check private build arguments
-    # if args.private:
-    #     if parser.kernel_path  or parser.image_path:
-    #         raise BaseException('--image_path or --kernel_path can\'t be used without --private!')
 
     os.chdir('/tmp')
 
@@ -98,15 +93,18 @@ def deploy(argv):
 
     # version = args.build
 
-    try:
+    # TODO: Need validate SCG Parameters here
 
+    try:
         f = FileLoader()
         if args.private:
             f.execute_customized(scg_profile)
         else:
-            f.execute_jenkins(args.type, args.name, args.branch, args.build)
-        cmd = ScriptFactory.create(args.type, args.name, args.nic, args.memory, f.qcow_path, f.scg_image_path,
-                                   f.kernel_path).generate()
+            f.execute_jenkins(scg_profile)
+
+        # cmd = ScriptFactory.create(scg_profile, f.local_qcow2_path, f.local_img_path,
+        #                           f.local_kernel_path).generate()
+        cmd = ScriptFactory.create(scg_profile, f.local_storage_params()).generate()
         print('executing command : %s' % cmd)
 
         if args.type != 'vscg':
@@ -124,7 +122,7 @@ def deploy(argv):
                 time.sleep(60)
         else:
             # Auto install process
-            Automation(args.type, args.name, args.ipv6).execute()
+            Automation(scg_profile).execute()
 
     except Exception as e:
         print(e.message)

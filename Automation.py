@@ -1,10 +1,10 @@
+import os
 import subprocess
 import sys
 import time
+import xml.etree.ElementTree as ET
 
 import pexpect
-import xml.etree.ElementTree as ET
-import os
 
 import Utilities
 import constant
@@ -16,10 +16,11 @@ __author__ = 'rayer'
 class Automation:
     name = ''
 
-    def __init__(self, type, name, ipv6):
-        self.name = name
-        self.type = type
-        self.ipv6 = ipv6
+    def __init__(self, scg_profile):
+        self.profile = scg_profile
+        self.name = scg_profile['name']
+        self.type = scg_profile['type']
+        self.ipv6 = scg_profile['ipv6']
 
     def execute(self):
         if self.type == 'vscg':

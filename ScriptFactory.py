@@ -12,54 +12,61 @@ class ScriptFactory:
         pass
 
     @staticmethod
-    def _create_scg_factory(name, allocated_memory, nic_count, storage_path, image_path, kernel_path):
-        print('Starting creating SCG script factory, name : %s, image_path = %s, kernel_path = %s, nic = %s' % (name, image_path, kernel_path, nic_count))
+    # def __create_scg_factory(name, allocated_memory, nic_count, storage_path, image_path, kernel_path):
+    def __create_scg_factory(scg_profile, local_files):
+        print('Start creating SCG Script factory with parameter : ')
+        print(scg_profile)
+        print(local_files)
         s = ScriptFactory()
-        s._gen_basic_script(name, allocated_memory)
-        s._gen_scg_template(name, storage_path, kernel_path, image_path)
-        s._gen_nic_template(nic_count)
+        s.__gen_basic_script(scg_profile)
+        s.__gen_scg_template(scg_profile, local_files)
+        s.__gen_nic_template(scg_profile)
         return s
 
     @staticmethod
-    def _create_vscg_factory(name, allocated_memory, nic_count, image_path):
-        print('Starting creating VSCG script factory, name : %s, image_path = %s, nic = %s' % (name, image_path, nic_count))
+    def __create_vscg_factory(scg_profile, local_files):
+        print('Start creating VSCG Script factory with parameter : ')
+        print(scg_profile)
+        print(local_files)
         s = ScriptFactory()
-        s._gen_basic_script(name, allocated_memory)
-        s._gen_vscg_template(name)
-        s._gen_nic_template(nic_count)
+        s.__gen_basic_script(scg_profile)
+        s.__gen_vscg_template(scg_profile)
+        s.__gen_nic_template(scg_profile)
         return s
 
     @staticmethod
-    def create(scg_type, name, nic_count, allocated_memory, storage_path, image_path='', kernel_path=''):
+    def create(scg_profile, local_files):
+
+        scg_type = scg_profile['type']
+
         if scg_type == 'scg' or scg_type == 'scge':
-            return ScriptFactory._create_scg_factory(name, allocated_memory, nic_count, storage_path, image_path,
-                                                     kernel_path)
+            return ScriptFactory.__create_scg_factory(scg_profile, local_files)
         elif scg_type == 'vscg':
-            return ScriptFactory._create_vscg_factory(name, allocated_memory, nic_count, storage_path)
+            return ScriptFactory.__create_vscg_factory(scg_profile, local_files)
 
-    def _gen_basic_script(self, name, allocated_memory):
-        self.output += 'virt-install --name %s --ram %d --vcpus=8 --os-type=linux --os-variant=rhel6 --vnc --wait 0 ' % (
-            name, allocated_memory * 1024)
+    def __gen_basic_script(self, scg_profile):
+        self.output += 'virt-install --name %(name)s --ram %(memory*1024)d --vcpus=%(cpu)d --os-type=linux \
+        --os-variant=rhel6 --vnc --wait 0 ' % scg_profile
 
     # will done file operations before generating the script
-    def _gen_scg_template(self, name, storage_path, kernel_path, image_path):
+    def __gen_scg_template(self, scg_profile, local_files):
         # gen storage script
-        self.output += '--hvm --disk path=%s,device=disk,format=qcow2,size=50,bus=sata ' % storage_path
+        self.output += '--hvm --disk path=%(storage_path)s,device=disk,format=qcow2,size=50,bus=sata ' % local_files
         # gen kernel install script
         self.output += '--cdrom=/kvm_images/ipxe.iso --boot cdrom,hd '
 
     # will done file operations before
     # generating the script
-    def _gen_vscg_template(self, name):
+    def __gen_vscg_template(self, scg_profile):
         # gen disk script
-        self.output += '--hvm --disk path=%s/%s.qcow2 ' % (constant.vm_storage_path, name)
+        self.output += '--hvm --disk path=%s/%s.qcow2 ' % (constant.vm_storage_path, scg_profile['name'])
         # gen '--import' attribute
         self.output += '--import '
 
-    def _gen_nic_template(self, num):
+    def __gen_nic_template(self, scg_profile):
         # gen nic script, first one always is "bridge0" and remainings are "bridge1"
-        for x in range(num):
-            if x == num - 1:
+        for x in range(scg_profile['nic']):
+            if x == scg_profile['nic'] - 1:
                 self.output += '--network bridge=bridge0,model=virtio '
             else:
                 self.output += '--network bridge=bridge1,model=virtio '
