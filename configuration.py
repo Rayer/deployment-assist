@@ -19,3 +19,19 @@ symbolic_link_map = (
 init_exec = (
     ('comm_server.py', True),
 )
+
+logger_config = {
+    'log_dir': '/var/log/',
+    'def_log_level': '',
+}
+
+interface_br = {
+    'management': '',
+    'control': '',
+    'cluster': ''
+}
+
+sesame_inf = {
+    'def_serial': '',
+    'def_sesame': ''
+}
