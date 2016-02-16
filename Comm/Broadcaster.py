@@ -24,6 +24,9 @@ class Broadcaster:
         self.socket.setsockopt(SOL_SOCKET, SO_BROADCAST, 1)
         self.socket.settimeout(self.def_timeout)
         self.port = bind_port
+        logger = Logger().get_logger()
+        logger.info('Starting up Broadcaster...')
+
 
     def broadcast_raw(self, raw_payload):
         logger = Logger().get_logger()

@@ -15,7 +15,8 @@ def responser_main():
     cs.setsockopt(SOL_SOCKET, SO_BROADCAST, 1)
     cs.bind(('', Comm.CommConfig.proto_port))
 
-    logger = Logger.get_logger()
+    logger = Logger().get_logger()
+    logger.info('Starting up Responser...')
 
     while True:
         (msg, b_from) = cs.recvfrom(4096)
