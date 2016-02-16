@@ -45,13 +45,15 @@ class ScriptFactory:
             return ScriptFactory.__create_vscg_factory(scg_profile, local_files)
 
     def __gen_basic_script(self, scg_profile):
-        self.output += 'virt-install --name %(name)s --ram %(memory*1024)d --vcpus=%(cpu)d --os-type=linux \
+
+        scg_profile.update({'memory_m': scg_profile['memory'] * 1024})
+        self.output += 'virt-install --name %(name)s --ram %(memory_m)d --vcpus=%(cpu)d --os-type=linux \
         --os-variant=rhel6 --vnc --wait 0 ' % scg_profile
 
     # will done file operations before generating the script
     def __gen_scg_template(self, scg_profile, local_files):
         # gen storage script
-        self.output += '--hvm --disk path=%(storage_path)s,device=disk,format=qcow2,size=50,bus=sata ' % local_files
+        self.output += '--hvm --disk path=%(qcow2_path)s,device=disk,format=qcow2,size=50,bus=sata ' % local_files
         # gen kernel install script
         self.output += '--cdrom=/kvm_images/ipxe.iso --boot cdrom,hd '
 

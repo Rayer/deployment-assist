@@ -10,6 +10,7 @@ import Utilities
 import ipxe_server
 from Automation import Automation
 from FileLoader import FileLoader
+from Logger.Logger import Logger
 from ScriptFactory import ScriptFactory
 from constant import *
 from interactive import InteractiveShell
@@ -30,6 +31,7 @@ __author__ = 'rayer'
 
 def deploy(argv):
     # Dump default values into SCG Profile.
+    logger = Logger().get_logger()
     scg_profile = dict((k, v[0]) for (k, v) in scg_default_values.items())
 
     supported_version = Utilities.get_supported_branches()
@@ -84,12 +86,12 @@ def deploy(argv):
     scg_profile.update(vars(args))
 
     # Print current argument setting :
-    print('VM Name : %s' % args.name)
-    print('Target Model : %s' % args.type)
-    print('Target Branch : %s' % args.branch)
-    print('Target Build : %s' % args.build)
-    print('NIC Count : %s' % args.nic)
-    print('Memory allocated : %d' % args.memory)
+    logger.debug('VM Name : %s' % args.name)
+    logger.debug('Target Model : %s' % args.type)
+    logger.debug('Target Branch : %s' % args.branch)
+    logger.debug('Target Build : %s' % args.build)
+    logger.debug('NIC Count : %s' % args.nic)
+    logger.debug('Memory allocated : %d' % args.memory)
 
     # version = args.build
 
@@ -105,7 +107,7 @@ def deploy(argv):
         # cmd = ScriptFactory.create(scg_profile, f.local_qcow2_path, f.local_img_path,
         #                           f.local_kernel_path).generate()
         cmd = ScriptFactory.create(scg_profile, f.local_storage_params()).generate()
-        print('executing command : %s' % cmd)
+        logger.debug('executing command : %s' % cmd)
 
         if args.type != 'vscg':
             ipxe_server.create_ipxe_thread()
@@ -113,22 +115,22 @@ def deploy(argv):
         system(cmd)
 
         if args.stage1_only:
-            print('-1 or --stage1_only is set, installation completed.')
-            print('Please setup SCG manually')
+            logger.debug('-1 or --stage1_only is set, installation completed.')
+            logger.debug('Please setup SCG manually')
 
             if args.type == 'scg' or args.type == 'scge':
                 # countdown 60 sec for closing IPXE
-                print('Wait 60 sec for iPXE down...')
+                logger.debug('Wait 60 sec for iPXE down...')
                 time.sleep(60)
         else:
             # Auto install process
             Automation(scg_profile).execute()
 
     except Exception as e:
-        print(e.message)
+        logger.debug(e.message)
         traceback.print_exc()
     finally:
-        print('Cleanup for ipxe server....')
+        logger.debug('Cleanup for ipxe server....')
         ipxe_server.cleanup_ipxe_thread()
 
 
