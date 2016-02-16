@@ -18,7 +18,7 @@ class Broadcaster:
     def_buffersize = 4096
     def_timeout = 1
 
-    def __init__(self, bind_port):
+    def __init__(self, bind_port=proto_port):
         self.socket = socket(AF_INET, SOCK_DGRAM)
         self.socket.setsockopt(SOL_SOCKET, SO_REUSEADDR, 1)
         self.socket.setsockopt(SOL_SOCKET, SO_BROADCAST, 1)

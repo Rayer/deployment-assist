@@ -9,6 +9,29 @@ if __name__ == '__main__':
     Welcome to Deploy Assist Private Build Utility!
     Please be noted that this application currently only support SCG/SZ100(1nic profile)
     ''')
+
+    try:
+        from Comm.Broadcaster import Broadcaster
+        from Comm.Cmds import *
+
+        vm_map = []
+        vm_list = Broadcaster().broadcast(GetVMList())
+        for vm_info in vm_list:
+            vm_map.append((vm_info[0]['host'], vm_info[1][0]))
+        if vm_map.__len__() <= 0:
+            raise BaseException('No server response for getting VMs, use default!')
+    except BaseException as B:
+        print(B)
+        vm_map = (
+            ('KVM01', '172.17.61.127'),
+            ('KVM02', '172.17.61.128'),
+            ('KVM03', '172.17.61.129'),
+            ('KVM04', '172.17.61.130'),
+            ('KVM05', '172.17.61.131'),
+        )
+
+    print('Using VMs map as below : ')
+    print(vm_map)
     name = raw_input('VM Name:')
 
     defImage = None
@@ -64,23 +87,6 @@ if __name__ == '__main__':
             break
 
     extra_options = raw_input('Extra options(Please leave it blank if you don\'t know what it is):')
-
-    try:
-        from Comm.Broadcaster import Broadcaster
-        from Comm.Cmds import *
-        vm_map = []
-        vm_list = Broadcaster().broadcast(GetVMList())
-        print('Probing VM')
-        for vm_info in vm_list:
-            vm_map.append((vm_info[0]['host'], vm_info[1][0]))
-    except:
-        vm_map = (
-            ('KVM01', '172.17.61.127'),
-            ('KVM02', '172.17.61.128'),
-            ('KVM03', '172.17.61.129'),
-            ('KVM04', '172.17.61.130'),
-            ('KVM05', '172.17.61.131'),
-        )
 
     index = 0
     for (kvm_name, ip) in vm_map:
