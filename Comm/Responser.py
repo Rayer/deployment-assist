@@ -4,6 +4,7 @@ from socket import *
 
 import Comm.Cmds
 import Comm.CommConfig
+from Logger.Logger import Logger
 
 __author__ = 'rayer'
 
@@ -14,21 +15,23 @@ def responser_main():
     cs.setsockopt(SOL_SOCKET, SO_BROADCAST, 1)
     cs.bind(('', Comm.CommConfig.proto_port))
 
+    logger = Logger.get_logger()
+
     while True:
         (msg, b_from) = cs.recvfrom(4096)
-        print('recv broadcast : %s' % msg)
+        logger.info('recv broadcast : %s' % msg)
         print(b_from)
 
         try:
             # Find if there is valid command in Cmds module
             eval_target = json.loads(msg).get('request') + '.handle_payload(json.loads(msg))'
-            print(eval_target)
+            logger.info(eval_target)
             ret = eval(eval_target)
             ret.update({'host': gethostname()})
-            print(ret)
+            logger.info(ret)
             cs.sendto(json.dumps(ret), b_from)
         except BaseException as be:
-            print('Exception is caught!')
+            logger.error('Exception is caught!')
             traceback.print_exc()
 
 

@@ -15,7 +15,7 @@ class Logger:
         logging.basicConfig(level=self.__loglevel__, filename='/var/log/kvmdeployment.log',
                             format=self.__format__)
         console = logging.StreamHandler()
-        console.setLevel(logging.DEBUG)
+        console.setLevel(logging.INFO)
         console.setFormatter(logging.Formatter(self.__format__))
         self.get_logger().addHandler(console)
 
