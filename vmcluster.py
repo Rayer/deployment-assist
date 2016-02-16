@@ -57,6 +57,20 @@ class CmdHandler:
             print(exec_res[0]['res'])
             print('\n')
 
+    def exec_search(self, vm_name_regex):
+        ret = self.broadcaster.broadcast(GetVMList())
+        pattern = re.compile(vm_name_regex)
+        for server_info in ret:
+            print('At %(ip)s(%(name)s) : ' % {'ip': server_info[1][0], 'name': server_info[0]['host']})
+            for running_vms in server_info[0]['running']:
+                if pattern.match(running_vms['name']):
+                    print('%s(%s)' % (running_vms['name'], 'Running'))
+
+            for stop_vm in server_info[0]['shutdown']:
+                if pattern.match(stop_vm):
+                    print('%s(%s)' % (stop_vm, 'Stopped'))
+        print('\n\r')
+
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='KVM Deployment Assist Cluster Tools')
     sub_parsers = parser.add_subparsers(help='Sub-command help', dest='subcmd')
@@ -79,6 +93,9 @@ if __name__ == '__main__':
 
     cmdexec_parser = sub_parsers.add_parser('exec', help='Execute a command for all hosts')
     cmdexec_parser.add_argument('command', help='(Danger)Command wants all client to execute')
+
+    search_parser = sub_parsers.add_parser('search', help='Search VMs')
+    search_parser.add_argument('keyword', help='Search keyword')
 
     parser.add_argument('-t', '--target', metavar='Target Address', help='Specify target server', dest='ip')
 
@@ -108,3 +125,6 @@ if __name__ == '__main__':
 
     if args.subcmd == 'exec':
         CmdHandler().exec_cmd(args.command)
+
+    if args.subcmd == 'search':
+        CmdHandler().exec_search(args.keyword)
