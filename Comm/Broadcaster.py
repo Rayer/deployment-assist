@@ -26,11 +26,11 @@ class Broadcaster:
         self.port = bind_port
 
     def broadcast_raw(self, raw_payload):
-        logger = Logger.get_logger()
+        logger = Logger().get_logger()
         ret = []
         logger.info('Sending : %s' % raw_payload)
         for broadcast_addr in broadcast_addr_list:
-            logger.debug('Sending to %s:%s' % broadcast_addr)
+            logger.debug('Sending to %s' % broadcast_addr)
             self.socket.sendto(raw_payload, (broadcast_addr, self.port))
 
         try:
