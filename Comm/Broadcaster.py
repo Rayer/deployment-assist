@@ -44,6 +44,7 @@ class Broadcaster:
         except BaseException as be:
             logger.error(be)
 
+        logger.debug('Get ret : %s' % ret)
         return ret
 
     def broadcast(self, broadcast_cmd):

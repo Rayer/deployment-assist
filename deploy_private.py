@@ -8,7 +8,6 @@ if __name__ == '__main__':
     print('''
     Welcome to Deploy Assist Private Build Utility!
     Please be noted that this application currently only support SCG/SZ100(1nic profile)
-
     ''')
     name = raw_input('VM Name:')
 
@@ -64,16 +63,24 @@ if __name__ == '__main__':
         else:
             break
 
-
     extra_options = raw_input('Extra options(Please leave it blank if you don\'t know what it is):')
 
-    vm_map = (
-        ('KVM01', '172.17.61.127'),
-        ('KVM02', '172.17.61.128'),
-        ('KVM03', '172.17.61.129'),
-        ('KVM04', '172.17.61.130'),
-        ('KVM05', '172.17.61.131'),
-    )
+    try:
+        from Comm.Broadcaster import Broadcaster
+        from Comm.Cmds import *
+        vm_map = []
+        vm_list = Broadcaster().broadcast(GetVMList())
+        print('Probing VM')
+        for vm_info in vm_list:
+            vm_map.append((vm_info[0]['host'], vm_info[1][0]))
+    except:
+        vm_map = (
+            ('KVM01', '172.17.61.127'),
+            ('KVM02', '172.17.61.128'),
+            ('KVM03', '172.17.61.129'),
+            ('KVM04', '172.17.61.130'),
+            ('KVM05', '172.17.61.131'),
+        )
 
     index = 0
     for (kvm_name, ip) in vm_map:
