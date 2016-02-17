@@ -1,5 +1,6 @@
 #!/usr/bin/python
 import argparse
+import logging
 import os
 import re
 
@@ -36,10 +37,29 @@ class CmdHandler:
             print('')
 
     def stats(self):
-        print(self.broadcaster.broadcast(GetKVMHostStat()))
+        stat = self.broadcaster.broadcast(GetKVMHostStat())
+        index = 0
+        for server_info in stat:
+            server_info[0].update({'ip': server_info[1][0], 'index': index})
+            index += 1
+            print(
+            '(%(index)d)\t%(ip)s(%(host)s)\tRunning:%(running)d\tShutdown:%(shutdown)d\tFree:%(free)s\tBuffer:%(buffers)s' %
+            server_info[0])
 
-    def deploy(self, vm_name, host_ip=None):
-        pass
+    def deploy(self):
+        stat = self.broadcaster.broadcast(GetKVMHostStat())
+        index = 0
+        for server_info in stat:
+            server_info[0].update({'ip': server_info[1][0], 'index': index})
+            index += 1
+            print(
+            '(%(index)d)\t%(ip)s(%(host)s)\tRunning:%(running)d\tShutdown:%(shutdown)d\tFree:%(free)s\tBuffer:%(buffers)s' %
+            server_info[0])
+        server_index = int(raw_input('Select a VM : '))
+        destination = stat[server_index]
+        print('Will deploy to : %s(%s)' % (destination[1][0], destination[0]['host']))
+        os.system('ssh -t root@%s -C \'vmmanage create\'' % destination[1][0])
+
 
     def delete(self, vm_name, host_ip=None):
         pass
@@ -85,9 +105,12 @@ class CmdHandler:
         select = int(raw_input('Select a VM : '))
         os.system('ssh -t root@%s -C \'virsh console %s\'' % (vm_list[select][1], vm_list[select][0]))
 
+
 if __name__ == '__main__':
+
     parser = argparse.ArgumentParser(description='KVM Deployment Assist Cluster Tools')
     sub_parsers = parser.add_subparsers(help='Sub-command help', dest='subcmd')
+    parser.add_argument('-d', '--debug', help='Enable console debugging', action='store_true')
 
     discovery_parser = sub_parsers.add_parser('discovery', help='Discovery commands')
     discovery_parser.add_argument('-v', '--verbose', help='List detailed KVM Guest info', action='store_true')
@@ -97,7 +120,7 @@ if __name__ == '__main__':
 
     # Deploy action, now only supports interactive
     deploy_parser = sub_parsers.add_parser('deploy', help='Deploy a VM')
-    deploy_parser.add_argument('name', help='VM Name')
+    # deploy_parser.add_argument('name', help='VM Name')
 
     delete_parser = sub_parsers.add_parser('delete', help='Delete a VM')
     delete_parser.add_argument('name', help='VM Name')
@@ -132,7 +155,7 @@ if __name__ == '__main__':
         CmdHandler().stats()
 
     if args.subcmd == 'deploy':
-        CmdHandler().deploy(args.name, args.ip)
+        CmdHandler().deploy()
 
     if args.subcmd == 'delete':
         CmdHandler().delete(args.name, args.ip)

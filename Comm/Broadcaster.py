@@ -42,7 +42,8 @@ class Broadcaster:
                 logger.info('Receiving from : ' + ipaddr[0])
                 ret.append((json.loads(recv), ipaddr))
         except BaseException as be:
-            logger.error(be)
+            # logger.error(be)
+            logger.info('time out')
 
         logger.debug('Get ret : %s' % ret)
         return ret
