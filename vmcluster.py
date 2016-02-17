@@ -1,5 +1,6 @@
 #!/usr/bin/python
 import argparse
+import os
 import re
 
 import Comm.CommConfig
@@ -71,6 +72,19 @@ class CmdHandler:
                     print('%s(%s)' % (stop_vm, 'Stopped'))
         print('\n\r')
 
+    def exec_console(self):
+        ret = self.broadcaster.broadcast(GetVMList())
+        print('Available VMs : ')
+        vm_list = []
+        for server_info in ret:
+            print('At %(ip)s(%(name)s) : ' % {'ip': server_info[1][0], 'name': server_info[0]['host']})
+            for vm in server_info[0]['running']:
+                vm_list.append((vm['name'], server_info[1][0]))
+                print('(%d)(%s)' % (vm_list.__len__() - 1, vm['name']))
+
+        select = int(raw_input('Select a VM : '))
+        os.system('ssh -t root@%s -C \'virsh console %s\'' % (vm_list[select][1], vm_list[select][0]))
+
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='KVM Deployment Assist Cluster Tools')
     sub_parsers = parser.add_subparsers(help='Sub-command help', dest='subcmd')
@@ -96,6 +110,9 @@ if __name__ == '__main__':
 
     search_parser = sub_parsers.add_parser('search', help='Search VMs')
     search_parser.add_argument('keyword', help='Search keyword')
+
+    console_parser = sub_parsers.add_parser('console', help='Connect to console')
+    # console_parser.add_argument();
 
     parser.add_argument('-t', '--target', metavar='Target Address', help='Specify target server', dest='ip')
 
@@ -128,3 +145,6 @@ if __name__ == '__main__':
 
     if args.subcmd == 'search':
         CmdHandler().exec_search(args.keyword)
+
+    if args.subcmd == 'console':
+        CmdHandler().exec_console()

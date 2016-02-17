@@ -24,9 +24,10 @@ class VMManage:
             print('%s' % offline)
         print('')
 
-    def do_setup(self):
+    def do_setup(self, syslink_only=False):
         Utilities.setup_system_symbolic_links(sys.argv[0])
-        Utilities.execute_setup_scripts(sys.argv[0])
+        if syslink_only is not True:
+            Utilities.execute_setup_scripts(sys.argv[0])
 
     def delete_vm(self, vm_name=None):
 
@@ -102,6 +103,9 @@ if __name__ == '__main__':
 
     if args.command == 'setup':
         v.do_setup()
+
+    if args.command == 'syslink':
+        v.do_setup(True)
 
     if args.command == 'delete':
         v.delete_vm(args.vm_name)
