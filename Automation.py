@@ -155,7 +155,7 @@ class Automation:
         c.sendline('admin!234')
         c.sendline('admin!234')
 
-        c.expect('Please login again.', timeout=1200)
+        c.expect('Please login again.', timeout=constant.scg_final_stage_wait_time)
         print('Installation finished!')
         c.sendline('')
 
@@ -238,7 +238,7 @@ class Automation:
         c.sendline('admin!234')
         c.sendline('admin!234')
 
-        c.expect('Please login again.', timeout=1200)
+        c.expect('Please login again.', timeout=constant.scg_final_stage_wait_time)
         print('Installation finished!')
         c.sendline('')
 
@@ -353,7 +353,7 @@ class Automation:
         c.sendline('admin!234')
         c.sendline('admin!234')
 
-        c.expect('Please login again.', timeout=1200)
+        c.expect('Please login again.', timeout=constant.scg_final_stage_wait_time)
         c.sendline('')
         self.__do_scg_login(c, 'admin', 'admin!234')
         # self.__do_sesame2(c)
