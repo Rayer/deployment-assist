@@ -283,4 +283,5 @@ def pid_lock_utils(pidfile, main_logic):
 
 
 def install_requirements():
+    os.system('pip install --upgrade pip')
     os.system('pip install -U -r requirements.txt')
