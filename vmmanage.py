@@ -25,6 +25,7 @@ class VMManage:
         print('')
 
     def do_setup(self, syslink_only=False):
+        Utilities.install_requirements()
         Utilities.setup_system_symbolic_links(sys.argv[0])
         if syslink_only is not True:
             Utilities.execute_setup_scripts(sys.argv[0])

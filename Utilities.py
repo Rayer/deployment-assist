@@ -280,3 +280,7 @@ def pid_lock_utils(pidfile, main_logic):
         main_logic()
     finally:
         os.remove(pidfile)
+
+
+def install_requirements():
+    os.system('pip install -U -r requirements.txt')

@@ -8,7 +8,7 @@ class Logger:
     def __init__(self):
         self.__logger__ = logging.getLogger(__name__)
         self.__loglevel__ = logging.DEBUG
-        self.__format__ = 'LINE %(lineno)-4d : %(levelname)-8s %(message)s'
+        self.__format__ = '%(asctime)s %(name)-12s %(levelname)-8s %(message)s'
         self.__logfile__ = '/var/log/kvmdeployment.log'
         self.__configuration__()
 

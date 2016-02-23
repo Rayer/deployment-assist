@@ -1,6 +1,5 @@
 #!/usr/bin/python
 import argparse
-import logging
 import os
 import re
 
@@ -50,15 +49,16 @@ class CmdHandler:
         stat = self.broadcaster.broadcast(GetKVMHostStat())
         index = 0
         for server_info in stat:
-            server_info[0].update({'ip': server_info[1][0], 'index': index})
+            server_info[0].update({'ip': self.__get_ip_from_server_info__(server_info), 'index': index})
             index += 1
             print(
             '(%(index)d)\t%(ip)s(%(host)s)\tRunning:%(running)d\tShutdown:%(shutdown)d\tFree:%(free)s\tBuffer:%(buffers)s' %
             server_info[0])
         server_index = int(raw_input('Select a VM : '))
         destination = stat[server_index]
-        print('Will deploy to : %s(%s)' % (destination[1][0], destination[0]['host']))
-        os.system('ssh -t root@%s -C \'vmmanage create\'' % destination[1][0])
+        print('Will deploy to : %s(%s)' % (
+        self.__get_ip_from_server_info__(destination), self.__get_host_from_server_info__(destination)))
+        os.system('ssh -t root@%s -C \'vmmanage create\'' % self.__get_ip_from_server_info__(destination))
 
 
     def delete(self, vm_name, host_ip=None):
@@ -82,7 +82,8 @@ class CmdHandler:
         ret = self.broadcaster.broadcast(GetVMList())
         pattern = re.compile(vm_name_regex)
         for server_info in ret:
-            print('At %(ip)s(%(name)s) : ' % {'ip': server_info[1][0], 'name': server_info[0]['host']})
+            print('At %(ip)s(%(name)s) : ' % {'ip': self.__get_ip_from_server_info__(server_info),
+                                              'name': self.__get_host_from_server_info__(server_info)})
             for running_vms in server_info[0]['running']:
                 if pattern.match(running_vms['name']):
                     print('%s(%s)' % (running_vms['name'], 'Running'))
@@ -105,6 +106,14 @@ class CmdHandler:
         select = int(raw_input('Select a VM : '))
         os.system('ssh -t root@%s -C \'virsh console %s\'' % (vm_list[select][1], vm_list[select][0]))
 
+    @staticmethod
+    def __get_ip_from_server_info__(server_info):
+        return server_info[1][0]
+
+    @staticmethod
+    def __get_host_from_server_info__(server_info):
+        return server_info[0]['host']
+
 
 if __name__ == '__main__':
 
@@ -115,10 +124,8 @@ if __name__ == '__main__':
     discovery_parser = sub_parsers.add_parser('discovery', help='Discovery commands')
     discovery_parser.add_argument('-v', '--verbose', help='List detailed KVM Guest info', action='store_true')
 
-    # Deploy action, now only supports interactive
-    deploy_parser = sub_parsers.add_parser('stats', help='Get Host status')
+    stats_parser = sub_parsers.add_parser('stats', help='Get Host status')
 
-    # Deploy action, now only supports interactive
     deploy_parser = sub_parsers.add_parser('deploy', help='Deploy a VM')
     # deploy_parser.add_argument('name', help='VM Name')
 

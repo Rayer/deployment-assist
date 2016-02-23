@@ -1,3 +1,5 @@
 BeautifulSoup
 pexpect
 PyGreSQL
+PyCrypto
+paramiko
