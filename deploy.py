@@ -132,6 +132,8 @@ def deploy(argv):
     finally:
         logger.debug('Cleanup for ipxe server....')
         ipxe_server.cleanup_ipxe_thread()
+        print('SCG Profile : ')
+        print(scg_profile)
 
 
 if __name__ == '__main__':

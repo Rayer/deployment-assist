@@ -21,6 +21,7 @@ class Automation:
         self.name = scg_profile['name']
         self.type = scg_profile['type']
         self.ipv6 = scg_profile['ipv6']
+        self.ip_attr = {}
 
     def execute(self):
         if self.type == 'vscg':
@@ -33,6 +34,8 @@ class Automation:
             print('Not support type %s yet!' % self.type)
             print('Wait 60 sec for ipxe down...')
             self.__prompt_pause(60)
+
+        self.profile.update({'ip':self.ip_attr})
 
     '''
     Automation SCG requires follow steps :
@@ -122,9 +125,9 @@ class Automation:
         # 2nd time setup
         c.sendline('setup')
         c.sendline('')
-
         c.expect('Do you want to setup network?')
         c.sendline('')
+        self.__parse_ip_carrier(c.before)
         c.expect('an exist cluster')
         c.sendline('c')
         c.expect('Cluster Name')
@@ -198,7 +201,10 @@ class Automation:
         c.sendline('2')
         c.expect(['Are these correct'])
         c.sendline('y')
-
+        print('-------------------')
+        print(c.before)
+        print('-------------------')
+        self.__parse_ip_enterprise(c.before)
         c.expect(['Primary'])
         c.sendline('8.8.8.8')
         c.sendline('8.8.4.4')
@@ -206,7 +212,6 @@ class Automation:
         # Prior from 3.1, it doesn't have this
         c.expect(['Control NAT', pexpect.TIMEOUT], timeout=12)
         c.sendline('')
-
         c.expect('an exist cluster')
         c.sendline('c')
         c.expect('Cluster Name')
@@ -328,6 +333,7 @@ class Automation:
 
         c.expect('Do you want to setup network?')
         c.sendline('')
+        self.__parse_ip_carrier(c.before)
         c.expect('an exist cluster')
         c.sendline('c')
         c.expect('Cluster Name')
@@ -449,3 +455,51 @@ class Automation:
 
         print(subprocess.check_output(['virsh', 'define', file_name]))
         os.remove(file_name)
+
+    def __parse_ip_carrier(self, log_entry):
+        keyword_if = ['Control', 'Cluster', 'Management']
+        keyword_ip = ['IP TYPE', 'IP Address', 'Netmask', 'Gateway', 'Control NAT IP']
+
+        current_if = ''
+        attr_map = {}
+        for line in log_entry.splitlines():
+            if ':' not in line:
+                continue
+            line = line.strip(':')
+            # parse interface:
+            for interface in keyword_if:
+                if interface == line:
+                    current_if = interface
+                    attr_map.update({interface: {}})
+                    print('adding %s' % interface)
+                    break
+
+            # parse ip type
+            for ip_attr in keyword_ip:
+                if ip_attr in line:
+                    line = line.split(':')[-1]
+                    line = line.strip()
+                    attr_map[current_if].update({ip_attr: line})
+                    break
+
+        self.ip_attr = attr_map
+
+    def __parse_ip_enterprise(self, log_entry):
+        keyword_attr = ['IP Address', 'Netmask', 'Gateway']
+        attr_map = {'Management': {}}
+        for line in log_entry.splitlines():
+            if ':' not in line:
+                continue
+
+            attr = line.split(':')[0].strip()
+            value = line.split(':')[-1].strip()
+
+            if attr not in keyword_attr:
+                continue
+
+            attr_map['Management'].update({attr: value})
+
+        self.ip_attr = attr_map
+
+
+
