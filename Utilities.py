@@ -144,12 +144,6 @@ def execute_setup_scripts(script_bin_path):
         else:
             os.system('python %s' % os.path.dirname(rp) + '/' + cmd)
 
-'''
-format :
-{'running':[{'id':2, 'name':'SCG34-SCG'}, {'id':6, 'name':'Dora-scg-34-2224'}],
- 'shutdown':['JasmineSCG', 'Kali-Penetration-TB02']}
-'''
-
 
 def get_vm_list():
     ret_list = subprocess.check_output(['virsh', 'list', '--all']).splitlines()
@@ -161,10 +155,9 @@ def get_vm_list():
             break
 
         if data[0] == '-':
-            ret['shutdown'].append(data[1])
+            ret['shutdown'].append({'id': -1, 'name': data[1]})
         else:
             ret['running'].append({'id': data[0], 'name': data[1]})
-
 
     return ret
 
@@ -203,8 +196,8 @@ def del_vm(vm_name):
             vm_exist = True
             vm_list = get_vm_list()
 
-    for name in vm_list['shutdown']:
-        if vm_name == name:
+    for vm in vm_list['shutdown']:
+        if vm_name == vm['name']:
             os.system('virsh undefine %s' % vm_name)
             vm_exist = True
             break
@@ -226,8 +219,8 @@ def start_vm(vm_name):
         if vm_name == vm_info['name']:
             raise ValueError('VM %s already in running state!' % vm_name)
 
-    for name in vm_list['shutdown']:
-        if name == vm_name:
+    for vm in vm_list['shutdown']:
+        if vm['name'] == vm_name:
             os.system('virsh start %s' % vm_name)
             return
 
@@ -243,8 +236,8 @@ def stop_vm(vm_name):
                 dao.delete(vm_info['name'])
             return
 
-    for name in vm_list['stop']:
-        if name == vm_name:
+    for vm in vm_list['stop']:
+        if vm['name'] == vm_name:
             raise ValueError('VM %s is already stopped!')
 
     raise ValueError('VM %s is not found!')
@@ -257,8 +250,8 @@ def get_vm_status(vm_name):
         if vm_name == vm['name'] or vm_name == vm['id']:
             return 'running'
 
-    for name in vm_list['shutdown']:
-        if vm_name == name:
+    for vm in vm_list['shutdown']:
+        if vm_name == vm['name']:
             return 'shutdown'
 
     return None

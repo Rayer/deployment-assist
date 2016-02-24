@@ -30,8 +30,8 @@ class CmdHandler:
             for running in server_info[0]['running']:
                 print('[%3s]\t\t%s' % (running['id'], running['name']))
             print('Shut VMs Count : %d' % server_info[0]['shutdown'].__len__())
-            for name in server_info[0]['shutdown']:
-                print('[---]\t\t%s' % name)
+            for stopped in server_info[0]['shutdown']:
+                print('[---]\t\t%s' % stopped['name'])
 
             print('')
 
@@ -89,7 +89,7 @@ class CmdHandler:
                     print('%s(%s)' % (running_vms['name'], 'Running'))
 
             for stop_vm in server_info[0]['shutdown']:
-                if pattern.match(stop_vm):
+                if pattern.match(stop_vm['name']):
                     print('%s(%s)' % (stop_vm, 'Stopped'))
         print('\n\r')
 

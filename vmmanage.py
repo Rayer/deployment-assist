@@ -21,7 +21,7 @@ class VMManage:
         print('')
         print('Offline :')
         for offline in vm_list['shutdown']:
-            print('%s' % offline)
+            print('%s' % offline['name'])
         print('')
 
     def do_setup(self, syslink_only=False):
@@ -68,7 +68,7 @@ class VMManage:
 
         count = 0
         for vm in vm_list['shutdown']:
-            print('(%2d)%s' % (count, vm))
+            print('(%2d)%s' % (count, vm['name']))
             count += 1
 
         choice = raw_input('Choice : ')
