@@ -27,7 +27,6 @@ class VMManage:
                 online['id'], online['name'], profile['ip']['Management']['IP Address'], profile['type'],
                 profile['branch'], profile['build']))
 
-
         print('')
         print('Offline :')
         for offline in vm_list['shutdown']:

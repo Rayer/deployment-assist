@@ -28,10 +28,19 @@ class CmdHandler:
             print('KVM IP : %s' % server_info[1][0])
             print('Running VMs Count : %d' % server_info[0]['running'].__len__())
             for running in server_info[0]['running']:
-                print('[%3s]\t\t%s' % (running['id'], running['name']))
+                base = '[%3s]\t\t%s' % (running['id'], running['name'])
+                if all(additional_info in running for additional_info in ('management', 'branch', 'type', 'build')):
+                    additional_info = '%(management)s\t%(branch)s\t%(type)s@%(build)s' % running
+                    print('%s\t%s' % (base, additional_info))
+                else:
+                    print(base)
             print('Shut VMs Count : %d' % server_info[0]['shutdown'].__len__())
             for stopped in server_info[0]['shutdown']:
-                print('[---]\t\t%s' % stopped['name'])
+                base = '[---]\t\t%s' % stopped['name']
+                if all(additional_info in stopped for additional_info in ('management', 'branch', 'type', 'build')):
+                    additional_info = '%(management)s\t%(branch)s\t%(type)s@%(build)s' % stopped
+                    print('%s\t%s' % (base, additional_info))
+                print(base)
 
             print('')
 
