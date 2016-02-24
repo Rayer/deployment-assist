@@ -8,6 +8,7 @@ from BeautifulSoup import BeautifulSoup
 
 import configuration
 import constant
+from Utils.database import open_scg_dao
 
 __author__ = 'rayer'
 
@@ -164,6 +165,7 @@ def get_vm_list():
         else:
             ret['running'].append({'id': data[0], 'name': data[1]})
 
+
     return ret
 
 
@@ -211,6 +213,8 @@ def del_vm(vm_name):
         path = constant.vm_storage_path + vm_name + '.qcow2'
         print('deleting file : %s' % path)
         os.remove(path)
+        with open_scg_dao() as dao:
+            dao.delete(vm_name)
     else:
         raise Exception('VM %(vm_name)s is not exist!' % {'vm_name': vm_name})
 
@@ -235,6 +239,8 @@ def stop_vm(vm_name):
     for vm_info in vm_list['running']:
         if vm_name == vm_info['id'] or vm_name == vm_info['name']:
             os.system('virsh destroy %s' % vm_info['name'])
+            with open_scg_dao() as dao:
+                dao.delete(vm_info['name'])
             return
 
     for name in vm_list['stop']:

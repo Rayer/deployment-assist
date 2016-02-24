@@ -12,6 +12,7 @@ from Automation import Automation
 from FileLoader import FileLoader
 from Logger.Logger import Logger
 from ScriptFactory import ScriptFactory
+from Utils.database import open_scg_dao
 from constant import *
 from interactive import InteractiveShell
 
@@ -132,8 +133,8 @@ def deploy(argv):
     finally:
         logger.debug('Cleanup for ipxe server....')
         ipxe_server.cleanup_ipxe_thread()
-        print('SCG Profile : ')
-        print(scg_profile)
+        with open_scg_dao() as dao:
+            dao.create(scg_profile)
 
 
 if __name__ == '__main__':
