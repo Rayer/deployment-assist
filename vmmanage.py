@@ -4,6 +4,7 @@ import sys
 
 import Utilities
 import deploy
+from Utils.database import open_scg_dao
 
 __author__ = 'rayer'
 
@@ -16,7 +17,16 @@ class VMManage:
         vm_list = Utilities.get_vm_list()
         print('Online :')
         for online in vm_list['running']:
-            print('[%s]:\t%s' % (online['id'], online['name']))
+            with open_scg_dao() as dao:
+                profile = dao.read(online['name'])
+                # print(profile)
+            if profile is None:
+                print('[%s]:\t%s' % (online['id'], online['name']))
+            else:
+                print('[%s]:\t%s %s %s %s %s' % (
+                online['id'], online['name'], profile['ip']['Management']['IP Address'], profile['type'],
+                profile['branch'], profile['build']))
+
 
         print('')
         print('Offline :')

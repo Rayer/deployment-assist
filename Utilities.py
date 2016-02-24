@@ -166,7 +166,7 @@ def get_vm_list():
 
         if profile is not None:
             additional_data = {
-                'Management': profile['ip']['Management']['IP Address'] if isRunning else None,
+                'Management': profile['ip']['Management']['IP Address'] if isRunning and 'ip' in profile else None,
                 'branch': profile['branch'],
                 'type': profile['type'],
                 'build': profile['build']
