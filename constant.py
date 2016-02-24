@@ -171,5 +171,6 @@ scg_default_values = {
     'nic': (3, [1, 3]),
     'cpu': (2, range(1, 4)),
     'memory': (16, range(7, 32)),
-    'ipv6': (False, [True, False])
+    'ipv6': (False, [True, False]),
+    'status': ('initialization', None)
 }

@@ -98,6 +98,7 @@ def deploy(argv):
 
     # TODO: Need validate SCG Parameters here
 
+    succeed = False
     try:
         f = FileLoader()
         if args.private:
@@ -109,6 +110,9 @@ def deploy(argv):
         #                           f.local_kernel_path).generate()
         cmd = ScriptFactory.create(scg_profile, f.local_storage_params()).generate()
         logger.debug('executing command : %s' % cmd)
+        scg_profile.update({'status': 'stage1'})
+        with open_scg_dao() as dao:
+            dao.update(scg_profile)
 
         if args.type != 'vscg':
             ipxe_server.create_ipxe_thread()
@@ -118,24 +122,30 @@ def deploy(argv):
         if args.stage1_only:
             logger.debug('-1 or --stage1_only is set, installation completed.')
             logger.debug('Please setup SCG manually')
-
+            succeed = True
+            scg_profile.update({'status': 'done(unmanaged)'})
+            with open_scg_dao() as dao:
+                dao.update(scg_profile)
             if args.type == 'scg' or args.type == 'scge':
                 # countdown 60 sec for closing IPXE
                 logger.debug('Wait 60 sec for iPXE down...')
                 time.sleep(60)
+
         else:
             # Auto install process
             Automation(scg_profile).execute()
+            succeed = True
 
     except Exception as e:
         logger.debug(e.message)
         traceback.print_exc()
+        succeed = False
     finally:
         logger.debug('Cleanup for ipxe server....')
         ipxe_server.cleanup_ipxe_thread()
+        scg_profile.update({'status': 'completed' if succeed else 'suspected damaged'})
         with open_scg_dao() as dao:
-            dao.create(scg_profile)
-
+            dao.update(scg_profile)
 
 if __name__ == '__main__':
     deploy(sys.argv[1:])

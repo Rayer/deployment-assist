@@ -241,6 +241,11 @@ def start_vm(vm_name):
     for vm in vm_list['shutdown']:
         if vm['name'] == vm_name:
             os.system('virsh start %s' % vm_name)
+            with open_scg_dao() as dao:
+                profile = dao.read(vm_name)
+                if profile is not None:
+                    profile.update({'status': 'completed'})
+                    dao.update(profile)
             return
 
     raise ValueError('Can\'t find VM %s !' % vm_name)
@@ -252,7 +257,10 @@ def stop_vm(vm_name):
         if vm_name == vm_info['id'] or vm_name == vm_info['name']:
             os.system('virsh destroy %s' % vm_info['name'])
             with open_scg_dao() as dao:
-                dao.delete(vm_info['name'])
+                profile = dao.read(vm_name)
+                if profile is not None:
+                    profile.update({'ip': None, 'status': 'stopped'})
+                    dao.update(profile)
             return
 
     for vm in vm_list['stop']:

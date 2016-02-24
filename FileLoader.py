@@ -4,6 +4,7 @@ import urllib
 
 import Utilities
 import constant
+from Utils.database import open_scg_dao
 
 __author__ = 'rayer'
 
@@ -32,6 +33,9 @@ class FileLoader:
 
     def execute_customized(self, scg_profile):
         print('Customized SCG operations....')
+        scg_profile.update({'status': 'downloading'})
+        with open_scg_dao() as dao:
+            dao.update(scg_profile)
 
         image_path = scg_profile['image_path']
         kernel_path = scg_profile['kernel_path']
