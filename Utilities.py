@@ -154,10 +154,29 @@ def get_vm_list():
         if data.__len__() < 1:
             break
 
-        if data[0] == '-':
-            ret['shutdown'].append({'id': -1, 'name': data[1]})
+        isRunning = data[0] != '-'
+
+        with open_scg_dao() as dao:
+            profile = dao.read(data[1])
+
+        ret_data = {
+            'id': '-' if data[0] == '-' else data[0],
+            'name': data[1]
+        }
+
+        if profile is not None:
+            additional_data = {
+                'Management': profile['ip']['Management']['IP Address'] if isRunning else None,
+                'branch': profile['branch'],
+                'type': profile['type'],
+                'build': profile['build']
+            }
+            ret_data.update(additional_data)
+
+        if isRunning:
+            ret['running'].append(ret_data)
         else:
-            ret['running'].append({'id': data[0], 'name': data[1]})
+            ret['shutdown'].append(ret_data)
 
     return ret
 

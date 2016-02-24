@@ -39,7 +39,7 @@ class DBAccess:
         self.path = '/var/run/kvm.db'
 
     def __load__(self):
-        with open(self.path, 'r+') as f:
+        with open(self.path, 'a+') as f:
             try:
                 self.record = json.loads(f.read())
             except:
