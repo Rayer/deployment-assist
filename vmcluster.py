@@ -17,7 +17,6 @@ class CmdHandler:
 
     def show(self, vm_detail=False, host_ip=None):
         server_info_list = self.broadcaster.broadcast(GetVMList())
-        print(server_info_list)
         for server_info in server_info_list:
             if not vm_detail:
                 print('%s(%s)\tOnline:%d\tOffline:%d' % (
