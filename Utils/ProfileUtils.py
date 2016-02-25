@@ -28,11 +28,13 @@ class ProfileParser:
     def get_status_color_print(self):
         color_map = {
             'running': prGreen,
+            'completed': prGreen,
             'downloading': prYellow,
             'installing': prYellow,
             'unmanaged': prYellow,
             'stopped': prPurple,
-            'damaged': prRed
+            'damaged': prRed,
+            'stage1': prYellow
         }
 
         if 'status' not in self.profile:

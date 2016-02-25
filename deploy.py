@@ -103,6 +103,7 @@ def deploy(argv):
         scg_profile.update({'status': 'downloading'})
         f = FileLoader()
         if args.private:
+            scg_profile.update({'branch': 'private', 'build': 'None'})
             f.execute_customized(scg_profile)
         else:
             f.execute_jenkins(scg_profile)
@@ -134,6 +135,9 @@ def deploy(argv):
 
         else:
             # Auto install process
+            scg_profile.update({'status': 'setup'})
+            with open_scg_dao() as dao:
+                dao.update(scg_profile)
             Automation(scg_profile).execute()
             succeed = True
 
