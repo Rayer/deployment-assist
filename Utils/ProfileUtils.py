@@ -30,11 +30,11 @@ class ProfileParser:
             'running': prGreen,
             'completed': prGreen,
             'downloading': prYellow,
-            'installing': prYellow,
+            'setup': prYellow,
             'unmanaged': prYellow,
             'stopped': prPurple,
             'damaged': prRed,
-            'stage1': prYellow
+            'stage1': prYellow,
         }
 
         if 'status' not in self.profile:
