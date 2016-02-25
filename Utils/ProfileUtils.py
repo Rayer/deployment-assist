@@ -44,3 +44,8 @@ class ProfileParser:
             return prNorm
 
         return color_map[self.profile['status']]
+
+
+class smart_dict(dict):
+    def __missing__(self, key):
+        return None
