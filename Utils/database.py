@@ -36,7 +36,7 @@ class DBAccess:
 
     def __init__(self):
         self.record = {}
-        self.path = '/var/run/kvm.db'
+        self.path = '/root/kvm.db'
 
     def __load__(self):
         with open(self.path, 'a+') as f:
