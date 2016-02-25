@@ -499,6 +499,9 @@ class Automation:
 
             attr_map['Management'].update({attr: value})
 
+        if self.profile['nic'] == 1:
+            attr_map.update({'Control': attr_map['Management']})
+
         self.ip_attr = attr_map
 
 
