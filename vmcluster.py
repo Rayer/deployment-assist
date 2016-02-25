@@ -6,6 +6,7 @@ import re
 import Comm.CommConfig
 from Comm.Broadcaster import Broadcaster
 from Comm.Cmds import *
+from Utils.ProfileUtils import ProfileParser, smart_dict
 
 __author__ = 'rayer'
 
@@ -28,12 +29,10 @@ class CmdHandler:
             print('KVM IP : %s' % server_info[1][0])
             print('Running VMs Count : %d' % server_info[0]['running'].__len__())
             for running in server_info[0]['running']:
-                base = '[%3s]\t\t%s' % (running['id'], running['name'])
-                if all(additional_info in running for additional_info in ('management', 'branch', 'type', 'build')):
-                    additional_info = '%(management)s\t%(branch)s\t%(type)s@%(build)s' % running
-                    print('%s\t%s' % (base, additional_info))
-                else:
-                    print(base)
+                p_parser = ProfileParser(running)
+                p_parser.get_status_color_print()(
+                    '[%(id)s]:\t%(name)s\t%(ip)s\t%(type)s\t%(build)s@%(branch)s\t%(status)s' % smart_dict(running))
+
             print('Shut VMs Count : %d' % server_info[0]['shutdown'].__len__())
             for stopped in server_info[0]['shutdown']:
                 base = '[---]\t\t%s' % stopped['name']

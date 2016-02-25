@@ -12,6 +12,7 @@ from Automation import Automation
 from FileLoader import FileLoader
 from Logger.Logger import Logger
 from ScriptFactory import ScriptFactory
+from Utils.ProfileUtils import smart_dict
 from Utils.database import open_scg_dao
 from constant import *
 from interactive import InteractiveShell
@@ -33,7 +34,7 @@ __author__ = 'rayer'
 def deploy(argv):
     # Dump default values into SCG Profile.
     logger = Logger().get_logger()
-    scg_profile = dict((k, v[0]) for (k, v) in scg_default_values.items())
+    scg_profile = smart_dict((k, v[0]) for (k, v) in scg_default_values.items())
 
     supported_version = Utilities.get_supported_branches()
 
@@ -103,6 +104,7 @@ def deploy(argv):
         scg_profile.update({'status': 'downloading'})
         f = FileLoader()
         if args.private:
+            scg_profile.update({'branch': 'private', 'build': 'None'})
             f.execute_customized(scg_profile)
         else:
             f.execute_jenkins(scg_profile)
@@ -134,6 +136,9 @@ def deploy(argv):
 
         else:
             # Auto install process
+            scg_profile.update({'status': 'setup'})
+            with open_scg_dao() as dao:
+                dao.update(scg_profile)
             Automation(scg_profile).execute()
             succeed = True
 

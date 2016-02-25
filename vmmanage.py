@@ -4,8 +4,7 @@ import sys
 
 import Utilities
 import deploy
-from Utils.ProfileUtils import ProfileParser
-from Utils.database import open_scg_dao
+from Utils.ProfileUtils import ProfileParser, smart_dict
 
 __author__ = 'rayer'
 
@@ -18,21 +17,15 @@ class VMManage:
         vm_list = Utilities.get_vm_list()
         print('Online :')
         for online in vm_list['running']:
-            with open_scg_dao() as dao:
-                profile = dao.read(online['name'])
-                # print(profile)
-            if profile is None:
-                print('[%s]:\t%s' % (online['id'], online['name']))
-            else:
-                pparser = ProfileParser(profile)
-                pparser.get_status_color_print()('[%s]:\t%s\t%s\t%s\t%s@%s\t%s' % (
-                    online['id'], online['name'], pparser.get_management_ip(), pparser.get_type(),
-                    pparser.get_branch(), pparser.get_build(), pparser.get_status()))
+            p_parser = ProfileParser(online)
+            online.update({'ip': p_parser.get_management_ip()})
+            p_parser.get_status_color_print()(
+                '[%(id)s]:\t%(name)s\t%(ip)s\t%(type)s\t%(build)s@%(branch)s\t%(status)s' % smart_dict(online))
 
         print('')
         print('Offline :')
         for offline in vm_list['shutdown']:
-            print('%s' % offline['name'])
+            print('[%(id)s]:\t%(name)s\t%(ip)s\t%(type)s\t%(build)s@%(branch)s\t%(status)s' % smart_dict(offline))
         print('')
 
     def do_setup(self, syslink_only=False):

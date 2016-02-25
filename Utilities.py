@@ -8,7 +8,6 @@ from BeautifulSoup import BeautifulSoup
 
 import configuration
 import constant
-from Utils.ProfileUtils import ProfileParser
 from Utils.database import open_scg_dao
 
 __author__ = 'rayer'
@@ -166,14 +165,7 @@ def get_vm_list():
         }
 
         if profile is not None:
-            parser = ProfileParser(profile)
-            additional_data = {
-                'management': parser.get_management_ip(),
-                'branch': parser.get_branch(),
-                'type': parser.get_type(),
-                'build': parser.get_build()
-            }
-            ret_data.update(additional_data)
+            ret_data.update(profile)
 
         if isRunning:
             ret['running'].append(ret_data)
