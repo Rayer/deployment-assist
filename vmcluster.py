@@ -30,16 +30,16 @@ class CmdHandler:
             print('Running VMs Count : %d' % server_info[0]['running'].__len__())
             for running in server_info[0]['running']:
                 p_parser = ProfileParser(running)
+                running.update({'management_ip': p_parser.get_management_ip()})
                 p_parser.get_status_color_print()(
-                    '[%(id)s]:\t%(name)s\t%(ip)s\t%(type)s\t%(build)s@%(branch)s\t%(status)s' % smart_dict(running))
+                    '[%(id)s]:\t%(name)s\t%(management_ip)s\t%(type)s\t%(build)s@%(branch)s\t%(status)s' % smart_dict(running))
 
             print('Shut VMs Count : %d' % server_info[0]['shutdown'].__len__())
             for stopped in server_info[0]['shutdown']:
-                base = '[---]\t\t%s' % stopped['name']
-                if all(additional_info in stopped for additional_info in ('management', 'branch', 'type', 'build')):
-                    additional_info = '%(management)s\t%(branch)s\t%(type)s@%(build)s' % stopped
-                    print('%s\t%s' % (base, additional_info))
-                print(base)
+                p_parser = ProfileParser(stopped)
+                stopped.update({'management_ip': None})
+                p_parser.get_status_color_print()(
+                    '[%(id)s]:\t%(name)s\t%(management_ip)s\t%(type)s\t%(build)s@%(branch)s\t%(status)s' % smart_dict(stopped))
 
             print('')
 
