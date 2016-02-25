@@ -4,6 +4,7 @@ import sys
 
 import Utilities
 import deploy
+from Utils.ProfileUtils import ProfileParser
 from Utils.database import open_scg_dao
 
 __author__ = 'rayer'
@@ -23,9 +24,10 @@ class VMManage:
             if profile is None:
                 print('[%s]:\t%s' % (online['id'], online['name']))
             else:
-                print('[%s]:\t%s %s %s %s %s' % (
-                online['id'], online['name'], profile['ip']['Management']['IP Address'], profile['type'],
-                profile['branch'], profile['build']))
+                pparser = ProfileParser(profile)
+                pparser.get_status_color_print()('[%s]:\t%s\t%s\t%s\t%s@%s\t%s' % (
+                    online['id'], online['name'], pparser.get_management_ip(), pparser.get_type(),
+                    pparser.get_branch(), pparser.get_build(), pparser.get_status()))
 
         print('')
         print('Offline :')

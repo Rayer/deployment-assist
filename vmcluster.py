@@ -14,7 +14,7 @@ class CmdHandler:
     def __init__(self):
         self.broadcaster = Broadcaster(Comm.CommConfig.proto_port)
 
-    def discovery(self, vm_detail=False, host_ip=None):
+    def show(self, vm_detail=False, host_ip=None):
         server_info_list = self.broadcaster.broadcast(GetVMList())
         print(server_info_list)
         for server_info in server_info_list:
@@ -130,7 +130,7 @@ if __name__ == '__main__':
     sub_parsers = parser.add_subparsers(help='Sub-command help', dest='subcmd')
     parser.add_argument('-d', '--debug', help='Enable console debugging', action='store_true')
 
-    discovery_parser = sub_parsers.add_parser('discovery', help='Discovery commands')
+    discovery_parser = sub_parsers.add_parser('show', help='Show commands')
     discovery_parser.add_argument('-v', '--verbose', help='List detailed KVM Guest info', action='store_true')
 
     stats_parser = sub_parsers.add_parser('stats', help='Get Host status')
@@ -165,7 +165,7 @@ if __name__ == '__main__':
             raise ValueError('IP address %s seems not a valid IP address!' % args.ip)
 
     if args.subcmd == 'discovery':
-        CmdHandler().discovery(args.verbose, args.ip)
+        CmdHandler().show(args.verbose, args.ip)
 
     if args.subcmd == 'stats':
         CmdHandler().stats()

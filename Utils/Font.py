@@ -20,3 +20,11 @@ def prLightGray(prt): print("\033[97m {}\033[00m".format(prt))
 
 
 def prBlack(prt): print("\033[98m {}\033[00m".format(prt))
+
+
+def prNorm(prt): print(prt)
+
+
+class ColorFontBuilder:
+    def __init__(self):
+        pass

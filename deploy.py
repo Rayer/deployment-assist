@@ -100,6 +100,7 @@ def deploy(argv):
 
     succeed = False
     try:
+        scg_profile.update({'status': 'downloading'})
         f = FileLoader()
         if args.private:
             f.execute_customized(scg_profile)
@@ -123,7 +124,7 @@ def deploy(argv):
             logger.debug('-1 or --stage1_only is set, installation completed.')
             logger.debug('Please setup SCG manually')
             succeed = True
-            scg_profile.update({'status': 'done(unmanaged)'})
+            scg_profile.update({'status': 'unmanaged'})
             with open_scg_dao() as dao:
                 dao.update(scg_profile)
             if args.type == 'scg' or args.type == 'scge':
@@ -143,7 +144,7 @@ def deploy(argv):
     finally:
         logger.debug('Cleanup for ipxe server....')
         ipxe_server.cleanup_ipxe_thread()
-        scg_profile.update({'status': 'completed' if succeed else 'suspected damaged'})
+        scg_profile.update({'status': 'running' if succeed else 'damaged'})
         with open_scg_dao() as dao:
             dao.update(scg_profile)
 
