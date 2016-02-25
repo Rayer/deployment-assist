@@ -164,7 +164,7 @@ if __name__ == '__main__':
         if not ip_pattern.match(args.ip):
             raise ValueError('IP address %s seems not a valid IP address!' % args.ip)
 
-    if args.subcmd == 'discovery':
+    if args.subcmd == 'show':
         CmdHandler().show(args.verbose, args.ip)
 
     if args.subcmd == 'stats':
