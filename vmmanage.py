@@ -18,14 +18,18 @@ class VMManage:
         print('Online :')
         for online in vm_list['running']:
             p_parser = ProfileParser(online)
-            online.update({'ip': p_parser.get_management_ip()})
+            online.update({'management_ip': p_parser.get_management_ip(), 'control_ip': p_parser.get_control_ip()})
             p_parser.get_status_color_print()(
-                '[%(id)s]:\t%(name)s\t%(ip)s\t%(type)s\t%(build)s@%(branch)s\t%(status)s' % smart_dict(online))
+                '[%(id)s]:\t%(name)s\t%(management_ip)s\t%(control_ip)s\t%(type)s\t%(build)s@%(branch)s\t%(status)s' % smart_dict(
+                    online))
 
         print('')
         print('Offline :')
         for offline in vm_list['shutdown']:
-            print('[%(id)s]:\t%(name)s\t%(ip)s\t%(type)s\t%(build)s@%(branch)s\t%(status)s' % smart_dict(offline))
+            p_parser = ProfileParser(offline)
+            offline.update({'ip': None})
+            p_parser.get_status_color_print()(
+                '[%(id)s]:\t%(name)s\t%(ip)s\t%(type)s\t%(build)s@%(branch)s\t%(status)s' % smart_dict(offline))
         print('')
 
     def do_setup(self, syslink_only=False):

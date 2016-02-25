@@ -9,6 +9,10 @@ class ProfileParser:
         if 'ip' in self.profile and 'Management' in self.profile['ip']:
             return self.profile['ip']['Management']['IP Address']
 
+    def get_control_ip(self):
+        if 'ip' in self.profile and 'Control' in self.profile['ip']:
+            return self.profile['ip']['Control']['IP Address']
+
     def get_branch(self):
         if 'branch' in self.profile:
             return self.profile['branch']

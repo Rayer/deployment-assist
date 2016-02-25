@@ -234,15 +234,19 @@ def start_vm(vm_name):
 
     for vm in vm_list['shutdown']:
         if vm['name'] == vm_name:
-            os.system('virsh start %s' % vm_name)
-            with open_scg_dao() as dao:
-                profile = dao.read(vm_name)
-                if profile is not None:
-                    profile.update({'status': 'running'})
-                    dao.update(profile)
+            __start_fetch_ip__(vm_name)
             return
 
     raise ValueError('Can\'t find VM %s !' % vm_name)
+
+
+def __start_fetch_ip__(vm_name):
+    os.system('virsh start %s' % vm_name)
+    with open_scg_dao() as dao:
+        profile = dao.read(vm_name)
+        if profile is not None:
+            profile.update({'status': 'running'})
+            dao.update(profile)
 
 
 def stop_vm(vm_name):
