@@ -275,7 +275,6 @@ def __start_fetch_ip__(vm_name):
         print('Unmanaged SCG started')
 
 
-
 def stop_vm(vm_name):
     vm_list = get_vm_list()
     for vm_info in vm_list['running']:
