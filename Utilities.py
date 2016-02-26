@@ -346,8 +346,11 @@ def purge_db():
 
     # before purge database, make a db copy.
 
+    backup_file = constant.database_loc + '-' + datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d %H:%M:%S')
     copyfile(constant.database_loc,
-             constant.database_loc + '-' + datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d %H:%M:%S'))
+             backup_file)
+
+    print('Database backed up to %s' % backup_file)
 
     vm_shutdown_names = []
     for vm in get_vm_list()['shutdown']:
@@ -362,6 +365,7 @@ def purge_db():
         for dao_vm_entry in dao.record.keys():
             if dao_vm_entry not in vm_shutdown_names:
                 dao.record.pop(dao_vm_entry, None)
+                print('Deleted entry : %s' % dao_vm_entry)
 
 
 
