@@ -426,10 +426,13 @@ class Automation:
 
         print('\nStarting Virsh.....')
         # system('virsh start %s' % self.name)
-
+        retry = 10
         while subprocess.call(['virsh', 'start', self.name]) != 0:
+            retry -= 1
             print('Domain %s seems still in installation process, wait for another 30 sec' % self.name)
             self.__prompt_pause(30)
+            if retry < 0:
+                raise RuntimeError('Time out while executing stage 1!')
 
         # After stage 1 completed, turn off iPXE server
         print('Shutting down embedded iPXE Server....')
