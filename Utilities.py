@@ -283,7 +283,7 @@ def stop_vm(vm_name):
         if vm_name == vm_info['id'] or vm_name == vm_info['name']:
             os.system('virsh destroy %s' % vm_info['name'])
             with open_scg_dao() as dao:
-                profile = dao.read(vm_name)
+                profile = dao.read(vm_info['name'])
                 if profile is not None:
                     profile.update({'status': 'stopped'})
                     dao.update(profile)
