@@ -23,11 +23,11 @@ class ProfileParser:
 
     def set_control_ip(self, ip):
         if 'ip' in self.profile and 'Control' in self.profile['ip']:
-            return self.profile['ip']['Control']['IP Address']
+            self.profile['ip']['Control']['IP Address'] = ip
 
     def set_cluster_ip(self, ip):
         if 'ip' in self.profile and 'Cluster' in self.profile['ip']:
-            return self.profile['ip']['Cluster']['IP Address']
+            self.profile['ip']['Cluster']['IP Address'] = ip
 
     def set_ip(self, ip_type, ip):
         ip_type_map = {
