@@ -20,7 +20,7 @@ class VMManage:
             p_parser = ProfileParser(online)
             online.update({'management_ip': p_parser.get_management_ip(), 'control_ip': p_parser.get_control_ip()})
             p_parser.get_status_color_print()(
-                '[%(id)s][%(status)-8s]:\t%(name)-30s\t%(management_ip)-16s\t%(control_ip)-16s\t%(type)5s\t%(build)s@%(branch)s' % smart_dict(
+                '[%(id)3s][%(status)-11s]:\t%(name)-30s\t%(management_ip)-16s\t%(control_ip)-16s\t%(type)5s\t%(build)s@%(branch)s' % smart_dict(
                     online))
 
         print('')
@@ -28,7 +28,7 @@ class VMManage:
         for offline in vm_list['shutdown']:
             p_parser = ProfileParser(offline)
             p_parser.get_status_color_print()(
-                '[%(id)s][%(status)-8s]:\t%(name)-30s\t%(type)5s\t%(build)s@%(branch)s' % smart_dict(offline))
+                '[%(id)3s][%(status)-11s]:\t%(name)-30s\t%(type)5s\t%(build)s@%(branch)s' % smart_dict(offline))
         print('')
 
     def do_setup(self, syslink_only=False):

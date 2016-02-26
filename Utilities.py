@@ -169,6 +169,8 @@ def get_vm_list():
 
         if profile is not None:
             ret_data.update(profile)
+        else:
+            ret_data.update({'status': 'unmanaged'})
 
         if isRunning:
             ret['running'].append(ret_data)
