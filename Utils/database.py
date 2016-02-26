@@ -1,5 +1,7 @@
 import json
 
+import constant
+
 '''
 Sample profile format :
 {"R-TestVSCG-ML":
@@ -36,7 +38,7 @@ class DBAccess:
 
     def __init__(self):
         self.record = {}
-        self.path = '/root/kvm.db'
+        self.path = constant.database_loc
 
     def __load__(self):
         with open(self.path, 'a+') as f:

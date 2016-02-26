@@ -96,13 +96,16 @@ class VMManage:
         choice = raw_input('Choice : ')
         Utilities.stop_vm(vm_list['running'][int(choice)]['name'])
 
+    def purgedb(self):
+        Utilities.purge_db()
+
 
 if __name__ == '__main__':
 
     parser = argparse.ArgumentParser(description='VM Customized Manager Wrapper')
     parser.add_argument('command', metavar='command',
-                        choices=['show', 'create', 'delete', 'setup', 'stop', 'start', 'syslink'],
-                        help='Commands : show, create, delete, setup, start, stop, syslink')
+                        choices=['show', 'create', 'delete', 'setup', 'stop', 'start', 'syslink', 'purge_db'],
+                        help='Commands : show, create, delete, setup, start, stop, syslink, purge_db')
     parser.add_argument('vm_name', metavar='vm_name', nargs='?', help='VM Name', default=None)
     args = parser.parse_args()
     v = VMManage()
@@ -127,3 +130,6 @@ if __name__ == '__main__':
 
     if args.command == 'stop':
         v.stop_vm(args.vm_name)
+
+    if args.command == 'purge_db':
+        v.purgedb()

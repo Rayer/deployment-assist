@@ -5,8 +5,11 @@ import subprocess
 import sys
 import urllib2
 
+import datetime
 import pexpect
+import time
 from BeautifulSoup import BeautifulSoup
+from shutil import copyfile
 
 import configuration
 import constant
@@ -337,3 +340,28 @@ def pid_lock_utils(pidfile, main_logic):
 def install_requirements():
     os.system('pip install --upgrade pip')
     os.system('pip install -U -r requirements.txt')
+
+
+def purge_db():
+
+    # before purge database, make a db copy.
+
+    copyfile(constant.database_loc,
+             constant.database_loc + '-' + datetime.datetime.fromtimestamp(time.time()).strftime('%Y-%m-%d %H:%M:%S'))
+
+    vm_shutdown_names = []
+    for vm in get_vm_list()['shutdown']:
+        vm_shutdown_names.append(vm['name'])
+
+    for vm in get_vm_list()['running']:
+        vm_shutdown_names.append(vm['name'])
+
+    print(vm_shutdown_names)
+    with open_scg_dao() as dao:
+        print(dao.record.keys())
+        for dao_vm_entry in dao.record.keys():
+            if dao_vm_entry not in vm_shutdown_names:
+                dao.record.pop(dao_vm_entry, None)
+
+
+

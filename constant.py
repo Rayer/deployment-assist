@@ -174,3 +174,5 @@ scg_default_values = {
     'ipv6': (False, [True, False]),
     'status': ('initialization', None)
 }
+
+database_loc = '/root/kvm.db'
