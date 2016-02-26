@@ -14,15 +14,13 @@ Periodically broadcast request, and responser will response request
 
 
 class Broadcaster:
-
-    def_buffersize = 4096
-    def_timeout = 1
+    def_buffersize = 8192
 
     def __init__(self, bind_port=proto_port):
         self.socket = socket(AF_INET, SOCK_DGRAM)
         self.socket.setsockopt(SOL_SOCKET, SO_REUSEADDR, 1)
         self.socket.setsockopt(SOL_SOCKET, SO_BROADCAST, 1)
-        self.socket.settimeout(self.def_timeout)
+        self.socket.settimeout(broadcast_timeout)
         self.port = bind_port
         logger = Logger().get_logger()
         logger.info('Starting up Broadcaster...')
