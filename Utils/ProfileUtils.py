@@ -13,6 +13,31 @@ class ProfileParser:
         if 'ip' in self.profile and 'Control' in self.profile['ip']:
             return self.profile['ip']['Control']['IP Address']
 
+    def get_cluster_ip(self):
+        if 'ip' in self.profile and 'Cluster' in self.profile['ip']:
+            return self.profile['ip']['Cluster']['IP Address']
+
+    def set_management_ip(self, ip):
+        if 'ip' in self.profile and 'Management' in self.profile['ip']:
+            self.profile['ip']['Management']['IP Address'] = ip
+
+    def set_control_ip(self, ip):
+        if 'ip' in self.profile and 'Control' in self.profile['ip']:
+            return self.profile['ip']['Control']['IP Address']
+
+    def set_cluster_ip(self, ip):
+        if 'ip' in self.profile and 'Cluster' in self.profile['ip']:
+            return self.profile['ip']['Cluster']['IP Address']
+
+    def set_ip(self, ip_type, ip):
+        ip_type_map = {
+            'management': self.set_management_ip,
+            'control': self.set_control_ip,
+            'controller': self.set_control_ip,
+            'cluster': self.set_cluster_ip
+        }
+        ip_type_map[ip_type.lower()](ip)
+
     def get_branch(self):
         if 'branch' in self.profile:
             return self.profile['branch']

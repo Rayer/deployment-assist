@@ -27,9 +27,8 @@ class VMManage:
         print('Offline :')
         for offline in vm_list['shutdown']:
             p_parser = ProfileParser(offline)
-            offline.update({'ip': None})
             p_parser.get_status_color_print()(
-                '[%(id)s]:\t%(name)s\t%(ip)s\t%(type)s\t%(build)s@%(branch)s\t%(status)s' % smart_dict(offline))
+                '[%(id)s]:\t%(name)s\t%(type)s\t%(build)s@%(branch)s\t%(status)s' % smart_dict(offline))
         print('')
 
     def do_setup(self, syslink_only=False):

@@ -2,12 +2,15 @@ import httplib
 import os
 import re
 import subprocess
+import sys
 import urllib2
 
+import pexpect
 from BeautifulSoup import BeautifulSoup
 
 import configuration
 import constant
+from Utils.ProfileUtils import ProfileParser
 from Utils.database import open_scg_dao
 
 __author__ = 'rayer'
@@ -242,11 +245,35 @@ def start_vm(vm_name):
 
 def __start_fetch_ip__(vm_name):
     os.system('virsh start %s' % vm_name)
+
+    managed = False
     with open_scg_dao() as dao:
         profile = dao.read(vm_name)
         if profile is not None:
             profile.update({'status': 'running'})
             dao.update(profile)
+            managed = True
+
+    if managed is True:
+        c = pexpect.spawn('virsh console %s' % vm_name, timeout=180)
+        c.logfile = sys.stdout
+        c.expect('login:')
+        keyword_ip = {'Controller IP': 'control', 'Cluster IP': 'cluster', 'Management IP': 'management'}
+        for line in c.before.splitlines():
+            if ':' not in line:
+                continue
+
+            for keyword in keyword_ip:
+                if keyword in line:
+                    ip = line.split(':')[-1].strip()
+                    parser = ProfileParser(profile)
+                    parser.set_ip(keyword_ip[keyword], ip)
+
+        with open_scg_dao() as dao:
+            dao.update(profile)
+    else:
+        print('Unmanaged SCG started')
+
 
 
 def stop_vm(vm_name):
@@ -257,7 +284,7 @@ def stop_vm(vm_name):
             with open_scg_dao() as dao:
                 profile = dao.read(vm_name)
                 if profile is not None:
-                    profile.update({'ip': None, 'status': 'stopped'})
+                    profile.update({'status': 'stopped'})
                     dao.update(profile)
             return
 
