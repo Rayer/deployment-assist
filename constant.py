@@ -172,7 +172,7 @@ scg_default_values = {
     'cpu': (2, range(1, 4)),
     'memory': (16, range(7, 32)),
     'ipv6': (False, [True, False]),
-    'status': ('initialization', None)
+    'status': ('initialize', None)
 }
 
 database_loc = '/root/kvm.db'

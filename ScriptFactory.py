@@ -55,7 +55,7 @@ class ScriptFactory:
         # gen storage script
         self.output += '--hvm --disk path=%(qcow2_path)s,device=disk,format=qcow2,size=50,bus=sata ' % local_files
         # gen kernel install script
-        self.output += '--cdrom=/kvm_images/ipxe.iso --boot cdrom,hd '
+        self.output += '--cdrom=/%s/ipxe.iso --boot cdrom,hd ' % constant.vm_storage_path
 
     # will done file operations before
     # generating the script

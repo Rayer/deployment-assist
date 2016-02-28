@@ -26,9 +26,9 @@ logger_config = {
 }
 
 interface_br = {
-    'management': '',
-    'control': '',
-    'cluster': ''
+    'management': 'bridge0',
+    'control': 'bridge1',
+    'cluster': 'bridge1'
 }
 
 sesame_inf = {

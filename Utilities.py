@@ -1,15 +1,16 @@
+import datetime
+import glob
 import httplib
 import os
 import re
 import subprocess
 import sys
-import urllib2
-
-import datetime
-import pexpect
 import time
-from BeautifulSoup import BeautifulSoup
+import urllib2
 from shutil import copyfile
+
+import pexpect
+from BeautifulSoup import BeautifulSoup
 
 import configuration
 import constant
@@ -342,6 +343,21 @@ def install_requirements():
     os.system('pip install -U -r requirements.txt')
 
 
+def get_all_vm_names():
+    ret = []
+    for vm in get_vm_list()['shutdown']:
+        ret.append(vm['name'])
+
+    for vm in get_vm_list()['running']:
+        ret.append(vm['name'])
+
+    return ret
+
+
+def get_all_storage_vm_imgs():
+    return glob.glob('%s/*.qcow2' % constant.vm_storage_path)
+
+
 def purge_db():
 
     # before purge database, make a db copy.
@@ -352,20 +368,23 @@ def purge_db():
 
     print('Database backed up to %s' % backup_file)
 
-    vm_shutdown_names = []
-    for vm in get_vm_list()['shutdown']:
-        vm_shutdown_names.append(vm['name'])
+    vm_names = get_all_vm_names()
 
-    for vm in get_vm_list()['running']:
-        vm_shutdown_names.append(vm['name'])
-
-    print(vm_shutdown_names)
+    print(vm_names)
     with open_scg_dao() as dao:
         print(dao.record.keys())
         for dao_vm_entry in dao.record.keys():
-            if dao_vm_entry not in vm_shutdown_names:
+            if dao_vm_entry not in vm_names:
                 dao.record.pop(dao_vm_entry, None)
                 print('Deleted entry : %s' % dao_vm_entry)
 
 
-
+def purge_storage():
+    vm_names = get_all_vm_names()
+    vm_storage_name = [i.replace('.qcow2', '').replace(constant.vm_storage_path, '') for i in get_all_storage_vm_imgs()]
+    print(vm_names)
+    print(vm_storage_name)
+    for vm_storage in get_all_storage_vm_imgs():
+        if vm_storage.replace('.qcow2', '').replace(constant.vm_storage_path, '') not in vm_names:
+            print('Removing untethered image file : %s' % vm_storage)
+            os.remove(vm_storage)

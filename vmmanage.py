@@ -99,13 +99,19 @@ class VMManage:
     def purgedb(self):
         Utilities.purge_db()
 
+    def purge_storage(self):
+        Utilities.purge_storage()
+
 
 if __name__ == '__main__':
 
+    v = VMManage()
+    supported_cmds = ['show', 'create', 'delete', 'setup', 'stop', 'start', 'syslink', 'purge_db', 'purge_storage']
+
     parser = argparse.ArgumentParser(description='VM Customized Manager Wrapper')
     parser.add_argument('command', metavar='command',
-                        choices=['show', 'create', 'delete', 'setup', 'stop', 'start', 'syslink', 'purge_db'],
-                        help='Commands : show, create, delete, setup, start, stop, syslink, purge_db')
+                        choices=supported_cmds,
+                        help='Commands : %s' % supported_cmds)
     parser.add_argument('vm_name', metavar='vm_name', nargs='?', help='VM Name', default=None)
     args = parser.parse_args()
     v = VMManage()
@@ -133,3 +139,6 @@ if __name__ == '__main__':
 
     if args.command == 'purge_db':
         v.purgedb()
+
+    if args.command == 'purge_storage':
+        v.purge_storage()
