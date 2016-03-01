@@ -176,12 +176,15 @@ def get_vm_list():
             if not running:
                 if pp.get_status() == 'running':
                     pp.set_status('stopped')
-                elif pp.get_status() in ['setup','stage1']:
+                elif pp.get_status() in ['setup', 'stage1']:
                     pp.set_status('damaged')
 
-                with open_scg_dao() as dao:
-                    dao.update(profile)
+            else:
+                if pp.get_status() == 'stopped':
+                    pp.set_status('running')
 
+            with open_scg_dao() as dao:
+                dao.update(profile)
             ret_data.update(profile)
         else:
             ret_data.update({'status': 'unmanaged'})
