@@ -68,16 +68,19 @@ class CmdHandler:
         self.__get_ip_from_server_info__(destination), self.__get_host_from_server_info__(destination)))
         os.system('ssh -t root@%s -C \'vmmanage create\'' % self.__get_ip_from_server_info__(destination))
 
+    def delete(self):
+        (kvm_server, target_name) = self.__exec_operation__('all')
+        print('Deleting %s at %s...' % (target_name, kvm_server))
+        os.system('ssh -t root@%s -C \'vmmanage delete %s\'' % (kvm_server, target_name))
 
-    def delete(self, vm_name, host_ip=None):
-        pass
+    def exec_stop(self):
+        (kvm_server, target_name) = self.__exec_operation__('running')
+        print('Stopping %s at %s...' % (target_name, kvm_server))
+        os.system('ssh -t root@%s -C \'vmmanage stop %s\'' % (kvm_server, target_name))
 
-    def sesame2(self, serial):
-        sesame2_list = self.broadcaster.broadcast(RequestSesame2(serial))
-        print(sesame2_list)
-
-    def reconfig_vm(self):
-        pass
+    def exec_start(self):
+        (kvm_server, target_name) = self.__exec_operation__('shutdown')
+        os.system('ssh -t root@%s -C \'vmmanage start %s\'' % (kvm_server, target_name))
 
     def exec_cmd(self, cmd):
         res_list = self.broadcaster.broadcast(ExecCmd(cmd))
@@ -102,17 +105,25 @@ class CmdHandler:
         print('\n\r')
 
     def exec_console(self):
+        (kvm_server, target_name) = self.__exec_operation__('running')
+        os.system('ssh -t root@%s -C \'virsh console %s\'' % (kvm_server, target_name))
+
+    def __exec_operation__(self, target_stat):
         ret = self.broadcaster.broadcast(GetVMList())
+        stat_list = ['running', 'shutdown'] if target_stat == 'all' else [target_stat]
         print('Available VMs : ')
         vm_list = []
         for server_info in ret:
             print('At %(ip)s(%(name)s) : ' % {'ip': server_info[1][0], 'name': server_info[0]['host']})
-            for vm in server_info[0]['running']:
-                vm_list.append((vm['name'], server_info[1][0]))
-                print('(%d)(%s)' % (vm_list.__len__() - 1, vm['name']))
-
+            for vm_stat in stat_list:
+                for vm in server_info[0][vm_stat]:
+                    pp = ProfileParser(vm)
+                    vm_list.append((vm['name'], server_info[1][0]))
+                    pp.get_status_color_print()(
+                        '(%3d)[%-11s]\t%-30s' % (vm_list.__len__() - 1, pp.get_status(), vm['name']))
         select = int(raw_input('Select a VM : '))
-        os.system('ssh -t root@%s -C \'virsh console %s\'' % (vm_list[select][1], vm_list[select][0]))
+        # Return : 1. KVM Server, 2. Target SCG Name
+        return vm_list[select][1], vm_list[select][0]
 
     @staticmethod
     def __get_ip_from_server_info__(server_info):
@@ -138,10 +149,13 @@ if __name__ == '__main__':
     # deploy_parser.add_argument('name', help='VM Name')
 
     delete_parser = sub_parsers.add_parser('delete', help='Delete a VM')
-    delete_parser.add_argument('name', help='VM Name')
+    # delete_parser.add_argument('name', help='VM Name')
 
-    sesame2_parser = sub_parsers.add_parser('sesame2', help='Get Sesame2')
-    sesame2_parser.add_argument('serial', help='Ask serial')
+    stop_parser = sub_parsers.add_parser('stop', help='Stop a SCG')
+    # stop_parser.add_argument('name', help='VM Name')
+
+    start_parser = sub_parsers.add_parser('start', help='Start a SCG')
+    # start_parser.add_argument('name', help='VM Name')
 
     cmdexec_parser = sub_parsers.add_parser('exec', help='Execute a command for all hosts')
     cmdexec_parser.add_argument('command', help='(Danger)Command wants all client to execute')
@@ -173,10 +187,7 @@ if __name__ == '__main__':
         CmdHandler().deploy()
 
     if args.subcmd == 'delete':
-        CmdHandler().delete(args.name, args.ip)
-
-    if args.subcmd == 'sesame2':
-        CmdHandler().sesame2(args.serial)
+        CmdHandler().delete()
 
     if args.subcmd == 'exec':
         CmdHandler().exec_cmd(args.command)
@@ -186,3 +197,9 @@ if __name__ == '__main__':
 
     if args.subcmd == 'console':
         CmdHandler().exec_console()
+
+    if args.subcmd == 'stop':
+        CmdHandler().exec_stop()
+
+    if args.subcmd == 'start':
+        CmdHandler().exec_start()
