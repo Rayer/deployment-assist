@@ -31,7 +31,7 @@ class CmdHandler:
                 p_parser = ProfileParser(running)
                 running.update({'management_ip': p_parser.get_management_ip(), 'control_ip': p_parser.get_control_ip()})
                 p_parser.get_status_color_print()(
-                    '[%(id)3s][%(status)-11s]:\t%(name)-30s\t%(management_ip)-16s\t%(control_ip)-16s\t%(type)5s\t%(build)s@%(branch)s' % smart_dict(
+                    '[%(id)3s][%(status)-11s]:\t%(name)-30s\t%(type)5s\t%(build)5s@%(branch)-9s\t%(management_ip)-16s\t%(control_ip)-16s' % smart_dict(
                         running))
 
             print('Shut VMs Count : %d' % server_info[0]['shutdown'].__len__())
@@ -39,7 +39,7 @@ class CmdHandler:
                 p_parser = ProfileParser(stopped)
                 stopped.update({'management_ip': None})
                 p_parser.get_status_color_print()(
-                    '[%(id)3s][%(status)-11s]:\t%(name)-30s\t%(type)5s\t%(build)s@%(branch)s' % smart_dict(stopped))
+                    '[%(id)3s][%(status)-11s]:\t%(name)-30s\t%(type)5s\t%(build)5s@%(branch)-9s' % smart_dict(stopped))
 
             print('')
 
