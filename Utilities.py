@@ -161,7 +161,7 @@ def get_vm_list():
         if data.__len__() < 1:
             break
 
-        isRunning = data[0] != '-'
+        running = data[0] != '-'
 
         with open_scg_dao() as dao:
             profile = dao.read(data[1])
@@ -171,12 +171,22 @@ def get_vm_list():
             'name': data[1]
         }
 
+        pp = ProfileParser(profile)
         if profile is not None:
+            if not running:
+                if pp.get_status() == 'running':
+                    pp.set_status('stopped')
+                elif pp.get_status() == 'setup':
+                    pp.set_status('damaged')
+
+                with open_scg_dao() as dao:
+                    dao.update(profile)
+
             ret_data.update(profile)
         else:
             ret_data.update({'status': 'unmanaged'})
 
-        if isRunning:
+        if running:
             ret['running'].append(ret_data)
         else:
             ret['shutdown'].append(ret_data)

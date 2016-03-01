@@ -74,6 +74,10 @@ class ProfileParser:
 
         return color_map[self.profile['status']]
 
+    def set_status(self, status):
+        if 'status' in self.profile:
+            self.profile['status'] = status
+
 
 class smart_dict(dict):
     def __missing__(self, key):
