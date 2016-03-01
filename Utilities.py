@@ -176,7 +176,7 @@ def get_vm_list():
             if not running:
                 if pp.get_status() == 'running':
                     pp.set_status('stopped')
-                elif pp.get_status() == 'setup':
+                elif pp.get_status() in ['setup','stage1']:
                     pp.set_status('damaged')
 
                 with open_scg_dao() as dao:
