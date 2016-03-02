@@ -50,7 +50,7 @@ class Automation:
 
         self.__handle_scg_stage1()
 
-        c = pexpect.spawn('virsh console %s' % self.name, timeout=1000)
+        c = pexpect.spawn('virsh console %s' % self.name, timeout=constant.scg_final_stage_wait_time)
         c.logfile = sys.stdout
         c.setecho(False)
 
@@ -173,7 +173,7 @@ class Automation:
 
         self.__handle_scg_stage1()
 
-        c = pexpect.spawn('virsh console %s' % self.name, timeout=1000)
+        c = pexpect.spawn('virsh console %s' % self.name, timeout=constant.scg_final_stage_wait_time)
         c.logfile = sys.stdout
         c.setecho(False)
 
@@ -253,7 +253,7 @@ class Automation:
     def execute_vscg(self):
         print('Executing VSCG Automatic Setup....')
         # VSCG need somehow bigger timeout, or setup process will cause timeout
-        c = pexpect.spawn('virsh console %s' % self.name, timeout=1000)
+        c = pexpect.spawn('virsh console %s' % self.name, timeout=constant.scg_final_stage_wait_time)
         c.logfile = sys.stdout
         c.setecho(False)
         self.__do_scg_login(c, 'admin', 'admin')
