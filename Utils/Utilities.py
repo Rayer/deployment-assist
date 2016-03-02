@@ -167,7 +167,7 @@ def get_vm_list():
 
         running = data[0] != '-'
 
-        profile = db_record[data[1]]
+        profile = db_record.get(data[1])
 
         ret_data = {
             'id': '-' if data[0] == '-' else data[0],
