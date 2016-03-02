@@ -33,7 +33,7 @@ def responser_main():
             cs.sendto(json.dumps(ret), b_from)
         except BaseException as be:
             logger.error('Exception is caught!')
-            traceback.print_exc()
+            logger.error(traceback.print_exc())
 
 
 if __name__ == '__main__':
