@@ -155,6 +155,10 @@ def execute_setup_scripts(script_bin_path):
 def get_vm_list():
     ret_list = subprocess.check_output(['virsh', 'list', '--all']).splitlines()
     ret = {'running': [], 'shutdown': []}
+
+    with open_scg_dao() as dao:
+        db_record = dao.record
+
     for seq in ret_list[2:]:  # Pass first two lines
         data = seq.split()
 
@@ -163,8 +167,7 @@ def get_vm_list():
 
         running = data[0] != '-'
 
-        with open_scg_dao() as dao:
-            profile = dao.read(data[1])
+        profile = db_record(data[1])
 
         ret_data = {
             'id': '-' if data[0] == '-' else data[0],

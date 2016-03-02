@@ -60,7 +60,7 @@ class ProfileParser:
             'completed': prGreen,
             'downloading': prYellow,
             'setup': prYellow,
-            'unmanaged': prYellow,
+            'unmanaged': prLightGray,
             'stopped': prPurple,
             'damaged': prRed,
             'stage1': prYellow,
