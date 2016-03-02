@@ -1,7 +1,7 @@
 import os
 import sys
 
-import Utilities
+from Utils import Utilities
 from constant import *
 
 __author__='rayer'

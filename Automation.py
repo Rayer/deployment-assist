@@ -6,9 +6,8 @@ import xml.etree.ElementTree as ET
 
 import pexpect
 
-import Utilities
 import constant
-import ipxe_server
+from Utils import ipxe_server, Utilities
 
 __author__ = 'rayer'
 

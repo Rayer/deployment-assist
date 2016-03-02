@@ -2,8 +2,8 @@
 import argparse
 import sys
 
-import Utilities
 import deploy
+from Utils import Utilities
 from Utils.ProfileUtils import ProfileParser, smart_dict
 
 __author__ = 'rayer'

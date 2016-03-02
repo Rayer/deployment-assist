@@ -6,12 +6,11 @@ import time
 import traceback
 from os import system
 
-import Utilities
-import ipxe_server
 from Automation import Automation
 from FileLoader import FileLoader
 from Logger.Logger import Logger
 from ScriptFactory import ScriptFactory
+from Utils import ipxe_server, Utilities
 from Utils.ProfileUtils import smart_dict
 from Utils.database import open_scg_dao
 from constant import *

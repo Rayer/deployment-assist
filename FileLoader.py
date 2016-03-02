@@ -2,8 +2,8 @@ import os
 import sys
 import urllib
 
-import Utilities
 import constant
+from Utils import Utilities
 from Utils.database import open_scg_dao
 
 __author__ = 'rayer'

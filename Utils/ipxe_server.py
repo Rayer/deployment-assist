@@ -10,13 +10,14 @@
 # This is a fork of original rks-ipxe-boot with necessary change for automatically installing SCG in KVM
 
 import os
+import subprocess
 import sys
-from StringIO import StringIO
 from SimpleHTTPServer import SimpleHTTPRequestHandler
 from SocketServer import TCPServer
+from StringIO import StringIO
 from threading import Thread
+
 import ipxe_server
-import subprocess
 
 TCPServer.allow_reuse_address = True
 

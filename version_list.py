@@ -2,7 +2,7 @@
 import argparse
 import sys
 
-import Utilities
+from Utils import Utilities
 
 __author__ = 'rayer'
 
