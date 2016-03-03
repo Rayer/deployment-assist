@@ -68,18 +68,18 @@ class CmdHandler:
         self.__get_ip_from_server_info__(destination), self.__get_host_from_server_info__(destination)))
         os.system('ssh -t root@%s -C \'vmmanage create\'' % self.__get_ip_from_server_info__(destination))
 
-    def delete(self):
-        (kvm_server, target_name) = self.__exec_operation__('all')
+    def delete(self, name=None, host=None):
+        (kvm_server, target_name) = self.__exec_operation__('all', name, host)
         print('Deleting %s at %s...' % (target_name, kvm_server))
         os.system('ssh -t root@%s -C \'vmmanage delete %s\'' % (kvm_server, target_name))
 
-    def exec_stop(self):
-        (kvm_server, target_name) = self.__exec_operation__('running')
+    def exec_stop(self, name=None, host=None):
+        (kvm_server, target_name) = self.__exec_operation__('running', name, host)
         print('Stopping %s at %s...' % (target_name, kvm_server))
         os.system('ssh -t root@%s -C \'vmmanage stop %s\'' % (kvm_server, target_name))
 
-    def exec_start(self):
-        (kvm_server, target_name) = self.__exec_operation__('shutdown')
+    def exec_start(self, name=None, host=None):
+        (kvm_server, target_name) = self.__exec_operation__('shutdown', name, host)
         os.system('ssh -t root@%s -C \'vmmanage start %s\'' % (kvm_server, target_name))
 
     def exec_cmd(self, cmd):
@@ -104,19 +104,28 @@ class CmdHandler:
                     print('%s(%s)' % (stop_vm, 'Stopped'))
         print('\n\r')
 
-    def exec_console(self):
-        (kvm_server, target_name) = self.__exec_operation__('running')
+    def exec_console(self, name=None, host=None):
+        (kvm_server, target_name) = self.__exec_operation__('running', name, host)
         os.system('ssh -t root@%s -C \'virsh console %s\'' % (kvm_server, target_name))
 
-    def __exec_operation__(self, target_stat):
+    def __exec_operation__(self, target_stat, name_filter=None, host_filter=None):
+        name_pattern = re.compile(name_filter if name_filter is not None else '')
+        host_pattern = re.compile(host_filter if host_filter is not None else '')
         ret = self.broadcaster.broadcast(GetVMList())
         stat_list = ['running', 'shutdown'] if target_stat == 'all' else [target_stat]
         print('Available VMs : ')
         vm_list = []
         for server_info in ret:
+            if not host_pattern.match(server_info[0]['host']):
+                continue
+
             print('At %(ip)s(%(name)s) : ' % {'ip': server_info[1][0], 'name': server_info[0]['host']})
             for vm_stat in stat_list:
                 for vm in server_info[0][vm_stat]:
+
+                    if not name_pattern.match(vm['name']):
+                        continue
+
                     pp = ProfileParser(vm)
                     vm_list.append((vm['name'], server_info[1][0]))
                     pp.get_status_color_print()(
@@ -134,6 +143,11 @@ class CmdHandler:
         return server_info[0]['host']
 
 
+def add_filters(child_parser):
+    child_parser.add_argument('--name', help='Add name filter')
+    child_parser.add_argument('--host', help='Add host filter')
+
+
 if __name__ == '__main__':
 
     parser = argparse.ArgumentParser(description='KVM Deployment Assist Cluster Tools')
@@ -146,16 +160,15 @@ if __name__ == '__main__':
     stats_parser = sub_parsers.add_parser('stats', help='Get Host status')
 
     deploy_parser = sub_parsers.add_parser('deploy', help='Deploy a VM')
-    # deploy_parser.add_argument('name', help='VM Name')
 
     delete_parser = sub_parsers.add_parser('delete', help='Delete a VM')
-    # delete_parser.add_argument('name', help='VM Name')
+    add_filters(delete_parser)
 
     stop_parser = sub_parsers.add_parser('stop', help='Stop a SCG')
-    # stop_parser.add_argument('name', help='VM Name')
+    add_filters(stop_parser)
 
     start_parser = sub_parsers.add_parser('start', help='Start a SCG')
-    # start_parser.add_argument('name', help='VM Name')
+    add_filters(start_parser)
 
     cmdexec_parser = sub_parsers.add_parser('exec', help='Execute a command for all hosts')
     cmdexec_parser.add_argument('command', help='(Danger)Command wants all client to execute')
@@ -164,7 +177,7 @@ if __name__ == '__main__':
     search_parser.add_argument('keyword', help='Search keyword')
 
     console_parser = sub_parsers.add_parser('console', help='Connect to console')
-    # console_parser.add_argument();
+    add_filters(console_parser)
 
     parser.add_argument('-t', '--target', metavar='Target Address', help='Specify target server', dest='ip')
 
@@ -187,7 +200,7 @@ if __name__ == '__main__':
         CmdHandler().deploy()
 
     if args.subcmd == 'delete':
-        CmdHandler().delete()
+        CmdHandler().delete(args.name, args.host)
 
     if args.subcmd == 'exec':
         CmdHandler().exec_cmd(args.command)
@@ -196,10 +209,10 @@ if __name__ == '__main__':
         CmdHandler().exec_search(args.keyword)
 
     if args.subcmd == 'console':
-        CmdHandler().exec_console()
+        CmdHandler().exec_console(args.name, args.host)
 
     if args.subcmd == 'stop':
-        CmdHandler().exec_stop()
+        CmdHandler().exec_stop(args.name, args.host)
 
     if args.subcmd == 'start':
-        CmdHandler().exec_start()
+        CmdHandler().exec_start(args.name, args.host)
