@@ -146,7 +146,7 @@ scg_control_br = 'bridge1'
 scg_default_serial = '00000089'
 scg_default_saseme = 'L340thQyugjQZIzY3oEOcDiXh0QVLM0Kytu@ntb4UAj5TF@qJrLhUwESKaj'
 scg_installation_wait_time = 180
-scg_final_stage_wait_time = 1800
+scg_final_stage_wait_time = 2400
 
 default_kvm_memory_allocated = 16
 
