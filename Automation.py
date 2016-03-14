@@ -267,6 +267,9 @@ class Automation:
         else:
             c.sendline('Carrier')
 
+        c.expect(['Are you sure', pexpect.TIMEOUT], timeout=12)
+        c.sendline('y')
+
         # This part will decide use ipv6 or not, let use ipv6
         c.expect(['Select address type'])
         if self.ipv6:
