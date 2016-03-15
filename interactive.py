@@ -83,7 +83,7 @@ class InteractiveShell:
             else:
                 memory = int(memory_raw)
 
-            if memory in xrange(8, 32):
+            if memory in xrange(7, 49):
                 self.args.memory = memory
                 break
             continue
