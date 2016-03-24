@@ -69,18 +69,22 @@ class CmdHandler:
         os.system('ssh -t root@%s -C \'vmmanage create\'' % self.__get_ip_from_server_info__(destination))
 
     def delete(self, name=None, host=None):
-        (kvm_server, target_name) = self.__exec_operation__('all', name, host)
-        print('Deleting %s at %s...' % (target_name, kvm_server))
-        os.system('ssh -t root@%s -C \'vmmanage delete %s\'' % (kvm_server, target_name))
+        ret_array = self.__exec_operation__('all', name, host)
+        for (kvm_server, target_name) in ret_array:
+            print('Deleting %s at %s...' % (target_name, kvm_server))
+            os.system('ssh -t root@%s -C \'vmmanage delete %s\'' % (kvm_server, target_name))
 
     def exec_stop(self, name=None, host=None):
-        (kvm_server, target_name) = self.__exec_operation__('running', name, host)
-        print('Stopping %s at %s...' % (target_name, kvm_server))
-        os.system('ssh -t root@%s -C \'vmmanage stop %s\'' % (kvm_server, target_name))
+        ret_array = self.__exec_operation__('running', name, host)
+        for (kvm_server, target_name) in ret_array:
+            print('Stopping %s at %s...' % (target_name, kvm_server))
+            os.system('ssh -t root@%s -C \'vmmanage stop %s\'' % (kvm_server, target_name))
 
     def exec_start(self, name=None, host=None):
-        (kvm_server, target_name) = self.__exec_operation__('shutdown', name, host)
-        os.system('ssh -t root@%s -C \'vmmanage start %s\'' % (kvm_server, target_name))
+        ret_array = self.__exec_operation__('shutdown', name, host)
+        print('Starting %s in order... ' % ret_array.__str__())
+        for (kvm_server, target_name) in ret_array:
+            os.system('ssh -t root@%s -C \'vmmanage start %s\'' % (kvm_server, target_name))
 
     def exec_cmd(self, cmd):
         res_list = self.broadcaster.broadcast(ExecCmd(cmd))
@@ -105,7 +109,11 @@ class CmdHandler:
         print('\n\r')
 
     def exec_console(self, name=None, host=None):
-        (kvm_server, target_name) = self.__exec_operation__('running', name, host)
+        ret_array = self.__exec_operation__('running', name, host)
+        if ret_array.__len__() is not 1:
+            print('Can\'t start multiple console at once!')
+            exit(1)
+        (kvm_server, target_name) = ret_array[0]
         os.system('ssh -t root@%s -C \'virsh console %s\'' % (kvm_server, target_name))
 
     def __exec_operation__(self, target_stat, name_filter=None, host_filter=None):
@@ -130,9 +138,13 @@ class CmdHandler:
                     vm_list.append((vm['name'], server_info[1][0]))
                     pp.get_status_color_print()(
                         '(%3d)[%-11s]\t%-30s' % (vm_list.__len__() - 1, pp.get_status(), vm['name']))
-        select = int(raw_input('Select a VM : '))
+        select = raw_input('Select a VM : ')
+        selection_array = select.split(' ')
+        ret_array = []
+        for selected in selection_array:
+            ret_array.append((vm_list[int(selected)][1], vm_list[int(selected)][0]))
         # Return : 1. KVM Server, 2. Target SCG Name
-        return vm_list[select][1], vm_list[select][0]
+        return ret_array
 
     @staticmethod
     def __get_ip_from_server_info__(server_info):
