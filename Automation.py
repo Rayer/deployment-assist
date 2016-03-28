@@ -7,12 +7,13 @@ import xml.etree.ElementTree as ET
 import pexpect
 
 import constant
+from Test.SanityTestSuite import SanityTestModule
 from Utils import ipxe_server, Utilities
 
 __author__ = 'rayer'
 
 
-class Automation:
+class Automation(SanityTestModule):
     name = ''
 
     def __init__(self, scg_profile):
@@ -45,6 +46,11 @@ class Automation:
     3. Wait 600 sec, or peek virsh domain list. The installation will turn off itself.
     4. Start regular SCG/SCGE automation install
     '''
+
+    def __mark_as_failed__(self):
+        SanityTestModule.__mark_as_failed__(self)
+        # TODO: just for now.
+        raise RuntimeError('Fail in setup process')
 
     def execute_scg(self):
 
@@ -157,7 +163,11 @@ class Automation:
         c.sendline('admin!234')
         c.sendline('admin!234')
 
-        c.expect('Please login again.', timeout=constant.scg_final_stage_wait_time)
+        c.expect(['Please login again.', 'Failed'], timeout=constant.scg_final_stage_wait_time)
+
+        if index == 1:  # Failed
+            self.__mark_as_failed__()
+
         print('Installation finished!')
         c.sendline('')
 
@@ -242,7 +252,11 @@ class Automation:
         c.sendline('admin!234')
         c.sendline('admin!234')
 
-        c.expect('Please login again.', timeout=constant.scg_final_stage_wait_time)
+        c.expect(['Please login again.', 'Failed'], timeout=constant.scg_final_stage_wait_time)
+
+        if index == 1:  # Failed
+            self.__mark_as_failed__()
+
         print('Installation finished!')
         c.sendline('')
 
@@ -361,7 +375,11 @@ class Automation:
         c.sendline('admin!234')
         c.sendline('admin!234')
 
-        c.expect('Please login again.', timeout=constant.scg_final_stage_wait_time)
+        c.expect(['Please login again.', 'Failed'], timeout=constant.scg_final_stage_wait_time)
+
+        if index == 1:  # Failed
+            self.__mark_as_failed__()
+
         c.sendline('')
         self.__do_scg_login(c, 'admin', 'admin!234')
         # self.__do_sesame2(c)

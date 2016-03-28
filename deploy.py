@@ -2,21 +2,21 @@
 import argparse
 import os
 import sys
+import time
 import traceback
 from os import system
-from datetime import datetime
 
 from Automation import Automation
 from FileLoader import FileLoader
 from Logger.Logger import Logger
 from ScriptFactory import ScriptFactory
 from Utils import ipxe_server, Utilities
+from Utils.APIOperation import APIOperation
+from Utils.Email import *
 from Utils.ProfileUtils import SCG_PROFILE
 from Utils.database import open_scg_dao
 from constant import *
 from interactive import InteractiveShell
-from Utils.Email import *
-import time
 
 __author__ = 'rayer'
 
@@ -31,6 +31,12 @@ __author__ = 'rayer'
     For branch mapping, it will be described in constant.py
 '''
 
+
+def prepare_snapshot(ip):
+    api = APIOperation(ip=ip)
+    api.do_login()
+    uuid = api.do_get_control_plane_list()['list'][0]['cpUUID']
+    return api.do_get_snap_logs(uuid).content
 
 def deploy(argv):
     # Dump default values into SCG Profile.
@@ -56,6 +62,7 @@ def deploy(argv):
     parser.add_argument('--kernel_path', help='Private build kernel location', dest='kernel_path', default='')
     parser.add_argument('--image_path', help='Private build image location', dest='image_path', default='')
     parser.add_argument('--sanity_test', help='Test sanity of a build', action='store_true')
+    parser.add_argument('--email', help='Sanity test email inform target', default='rayer.tung@ruckuswireless.com')
 
     args = parser.parse_args(argv)
 
@@ -92,8 +99,6 @@ def deploy(argv):
         Utilities.del_vm(args.name)
 
     scg_profile.update(vars(args))
-
-    logger.info(scg_profile.__repr__())
 
     # TODO: Need validate SCG Parameters here
 
@@ -135,7 +140,8 @@ def deploy(argv):
             scg_profile.update({'status': 'setup'})
             with open_scg_dao() as dao:
                 dao.update(scg_profile)
-            Automation(scg_profile).execute()
+            auto = Automation(scg_profile)
+            auto.execute()
             succeed = True
 
     except Exception as e:
@@ -154,15 +160,40 @@ def deploy(argv):
             # Sanity test result
             print('Sanity Test result : %r' % succeed)
             if succeed:
-                print('Sanity test for %s for profile %s is succeed, deleting %s' % (args.name, args.type, args.name))
+                logger.info(
+                    'Sanity test for %s for profile %s is completed, deleting %s' % (args.name, args.type, args.name))
                 send_email('Sanity Test Result %s@%s - %s' % (scg_profile['build'], scg_profile['branch'], 'Succeed'),
                            'sanity-test@kvm01.local', ['rayer.tung@ruckuswireless.com'], 'Setup succeed!')
                 Utilities.del_vm(args.name)
                 return True
             else:
-                print('Sanity test for %s for profile %s is succeed, deleting %s' % (args.name, args.type, args.name))
+                snapshot = None
+                err = None
+                if 'auto' in locals():
+                    try:
+                        ip = auto.ip_attr['Management']['IP Address']
+                        snapshot = prepare_snapshot(ip)
+                        print('Snapshot size : {}'.format(snapshot.__len__()))
+                    except Exception as e:
+                        print('Fail to get snapshot!')
+                        err = e
+                else:
+                    logger.error('Fail to get IP, no snapshot is attached!')
+
+                logger.info(
+                    'Sanity test for %s for profile %s is completed, deleting %s' % (args.name, args.type, args.name))
                 send_email('Sanity Test Result %s@%s - %s' % (scg_profile['build'], scg_profile['branch'], 'Failed!'),
-                           'sanity-test@kvm01.local', ['rayer.tung@ruckuswireless.com'], 'Setup Failed!!')
+                           'sanity-test@kvm01.local', ['rayer.tung@ruckuswireless.com'],
+                           '''
+Setup Failed!
+{}
+                           '''.format(traceback.format_exc()))
+                if snapshot is not None:
+                    send_email(
+                        'Sanity Test Result %s@%s - %s' % (scg_profile['build'], scg_profile['branch'], 'Failed!'),
+                        'sanity-test@kvm01.local', ['rayer.tung@ruckuswireless.com'], 'Setup Failed!!',
+                        snapshot)
+                Utilities.del_vm(args.name)
                 return False
 
     return succeed

@@ -1,5 +1,5 @@
-from datetime import datetime
 import time
+from datetime import datetime
 
 from Utils.Font import *
 
@@ -100,6 +100,4 @@ class SCG_PROFILE(dict):
         '''.format(p=self, local=datetime.fromtimestamp(self['init_time']))
 
     def update_lastseen(self):
-        self.update({'lastseen': time.localtime()})
-
-
+        self.update({'lastseen': time.mktime(time.localtime())})

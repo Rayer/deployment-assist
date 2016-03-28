@@ -1,9 +1,10 @@
 import json
+
 import requests
 
 
 class APIOperation:
-    def __init__(self, ip, name='Default', port=7443, version='v3_1', user='admin', password='admin!234'):
+    def __init__(self, ip, name='Default', port=7443, version='v4_0', user='admin', password='admin!234'):
         self.version = version
         self.name = name
         self.ip_addr = ip
