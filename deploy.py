@@ -181,11 +181,12 @@ def deploy(argv):
                     logger.error('Fail to get IP, no snapshot is attached!')
 
                 logger.info(
-                    'Sanity test for %s for profile %s is completed, deleting %s' % (args.name, args.type, args.name))
+                    'Sanity test for %s for profile %s is completed, won\'t %s' % (args.name, args.type, args.name))
                 send_email('Sanity Test Result %s@%s - %s' % (scg_profile['build'], scg_profile['branch'], 'Failed!'),
                            'sanity-test@kvm01.local', [args.email],
                            '''
-Setup Failed!
+Setup Failed! please download snapshot manually
+
 {}
                            '''.format(traceback.format_exc()))
                 if snapshot is not None:
@@ -193,7 +194,6 @@ Setup Failed!
                         'Sanity Test Result %s@%s - %s' % (scg_profile['build'], scg_profile['branch'], 'Failed!'),
                         'sanity-test@kvm01.local', [args.email], 'Setup Failed!!',
                         snapshot)
-                Utilities.del_vm(args.name)
                 return False
 
     return succeed
