@@ -92,8 +92,9 @@ if __name__ == '__main__':
     sanity_test = raw_input('Is it build for sanity test[y/N] :')
 
     if sanity_test.lower() == 'y':
-        # do sanity test process.
-        pass
+        extra_options += ' --sanity_test'
+        email = raw_input('Notification email : ')
+        extra_options += ' --email {}'.format(email)
 
     index = 0
 
@@ -105,7 +106,10 @@ if __name__ == '__main__':
         for server_info in vm_list:
             server_info[0].update({'ip': server_info[1][0], 'index': index})
             index += 1
-            print('(%(index)d)\t%(ip)s(%(host)s)\tRunning:%(running)d\tShutdown:%(shutdown)d\tFree:%(free)s\tBuffer:%(buffers)s' % server_info[0])
+            print(
+            '({p[index]})\t{p[ip]}({p[host]})\tRunning:{running_count}\tShutdown:{shutdown_count}'.format(
+                p=server_info[0], running_count=len(server_info[0]['running']),
+                shutdown_count=len(server_info[0]['shutdown'])))
 
     choice = int(raw_input('Choice:'))
     target_kvm = vm_map[choice][1]
