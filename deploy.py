@@ -62,7 +62,7 @@ def deploy(argv):
     parser.add_argument('--kernel_path', help='Private build kernel location', dest='kernel_path', default='')
     parser.add_argument('--image_path', help='Private build image location', dest='image_path', default='')
     parser.add_argument('--sanity_test', help='Test sanity of a build', action='store_true')
-    parser.add_argument('--email', help='Sanity test email inform target', default='rayer.tung@ruckuswireless.com')
+    parser.add_argument('--email', help='Sanity test email inform target', default='dl-tdc-eng-nms-scg-app@ruckuswireless.com')
 
     args = parser.parse_args(argv)
 
@@ -163,7 +163,7 @@ def deploy(argv):
                 logger.info(
                     'Sanity test for %s for profile %s is completed, deleting %s' % (args.name, args.type, args.name))
                 send_email('Sanity Test Result %s@%s - %s' % (scg_profile['build'], scg_profile['branch'], 'Succeed'),
-                           'sanity-test@kvm01.local', ['rayer.tung@ruckuswireless.com'], 'Setup succeed!')
+                           'sanity-test@kvm01.local', [args.email], 'Setup succeed!')
                 Utilities.del_vm(args.name)
                 return True
             else:
@@ -183,7 +183,7 @@ def deploy(argv):
                 logger.info(
                     'Sanity test for %s for profile %s is completed, deleting %s' % (args.name, args.type, args.name))
                 send_email('Sanity Test Result %s@%s - %s' % (scg_profile['build'], scg_profile['branch'], 'Failed!'),
-                           'sanity-test@kvm01.local', ['rayer.tung@ruckuswireless.com'],
+                           'sanity-test@kvm01.local', [args.email],
                            '''
 Setup Failed!
 {}
@@ -191,7 +191,7 @@ Setup Failed!
                 if snapshot is not None:
                     send_email(
                         'Sanity Test Result %s@%s - %s' % (scg_profile['build'], scg_profile['branch'], 'Failed!'),
-                        'sanity-test@kvm01.local', ['rayer.tung@ruckuswireless.com'], 'Setup Failed!!',
+                        'sanity-test@kvm01.local', [args.email], 'Setup Failed!!',
                         snapshot)
                 Utilities.del_vm(args.name)
                 return False
