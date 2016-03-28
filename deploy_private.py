@@ -10,6 +10,7 @@ if __name__ == '__main__':
     Please be noted that this application currently only support SCG/SZ100(1nic profile)
     ''')
 
+    use_default = False
     try:
         from Comm.Broadcaster import Broadcaster
         from Comm.Cmds import *
@@ -29,6 +30,7 @@ if __name__ == '__main__':
             ('KVM04', '172.17.61.130'),
             ('KVM05', '172.17.61.131'),
         )
+        use_default = True
 
     print('Using VMs map as below : ')
     print(vm_map)
@@ -87,11 +89,23 @@ if __name__ == '__main__':
             break
 
     extra_options = raw_input('Extra options(Please leave it blank if you don\'t know what it is):')
+    sanity_test = raw_input('Is it build for sanity test[y/N] :')
+
+    if sanity_test.lower() == 'y':
+        # do sanity test process.
+        pass
 
     index = 0
-    for (kvm_name, ip) in vm_map:
-        print('[%(index)d]\t%(ip)s(%(name)s)' % {'index': index, 'ip': ip, 'name': kvm_name})
-        index += 1
+
+    if use_default is True:
+        for (kvm_name, ip) in vm_map:
+            print('[%(index)d]\t%(ip)s(%(name)s)' % {'index': index, 'ip': ip, 'name': kvm_name})
+            index += 1
+    else:
+        for server_info in vm_list:
+            server_info[0].update({'ip': server_info[1][0], 'index': index})
+            index += 1
+            print('(%(index)d)\t%(ip)s(%(host)s)\tRunning:%(running)d\tShutdown:%(shutdown)d\tFree:%(free)s\tBuffer:%(buffers)s' % server_info[0])
 
     choice = int(raw_input('Choice:'))
     target_kvm = vm_map[choice][1]

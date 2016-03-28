@@ -2,19 +2,21 @@
 import argparse
 import os
 import sys
-import time
 import traceback
 from os import system
+from datetime import datetime
 
 from Automation import Automation
 from FileLoader import FileLoader
 from Logger.Logger import Logger
 from ScriptFactory import ScriptFactory
 from Utils import ipxe_server, Utilities
-from Utils.ProfileUtils import smart_dict
+from Utils.ProfileUtils import SCG_PROFILE
 from Utils.database import open_scg_dao
 from constant import *
 from interactive import InteractiveShell
+from Utils.Email import *
+import time
 
 __author__ = 'rayer'
 
@@ -33,7 +35,8 @@ __author__ = 'rayer'
 def deploy(argv):
     # Dump default values into SCG Profile.
     logger = Logger().get_logger()
-    scg_profile = smart_dict((k, v[0]) for (k, v) in scg_default_values.items())
+    scg_profile = SCG_PROFILE((k, v[0]) for (k, v) in scg_default_values.items())
+    scg_profile.update({'init_time': time.mktime(time.localtime())})
 
     supported_version = Utilities.get_supported_branches()
 
@@ -41,7 +44,7 @@ def deploy(argv):
     parser.add_argument('name', metavar='name')
     parser.add_argument('-t', '--type', choices=['scg', 'scge', 'vscg'], help='target SCG type', default='vscg', dest='type')
     parser.add_argument('-b', '--branch', choices=supported_version, help='Target branch', default='ml', dest='branch')
-    parser.add_argument('-B', '--build', help='Target Build Number', default='710', dest='build')
+    parser.add_argument('-B', '--build', help='Target Build Number', default='0', dest='build')
     # parser.add_argument('-n', '--nic', choices=[1, 3], help='NIC Count', type=int, default='3', dest='nic')
     parser.add_argument('-i', '--interactive', help='Interactive mode, all other argument will be ignored!', action='store_true')
     parser.add_argument('-6', '--ipv6', help='Active IPV6', action='store_true')
@@ -52,6 +55,7 @@ def deploy(argv):
     parser.add_argument('--private', help='Private Build', action='store_true')
     parser.add_argument('--kernel_path', help='Private build kernel location', dest='kernel_path', default='')
     parser.add_argument('--image_path', help='Private build image location', dest='image_path', default='')
+    parser.add_argument('--sanity_test', help='Test sanity of a build', action='store_true')
 
     args = parser.parse_args(argv)
 
@@ -75,10 +79,13 @@ def deploy(argv):
     # args.nic = 1 if args.type == 'scge' else 3
     args.nic = 3
     # args.private = False
+    if args.build == '0':
+        args.build = Utilities.get_most_recent_version(args.branch, args.type)
+
     if args.interactive:
         InteractiveShell(args).execute()
     elif args.private:
-        # seems don't need to do anything....?
+        # if build is 0, it means we should get most recent build
         pass
 
     if will_delete_old_vm:
@@ -86,15 +93,7 @@ def deploy(argv):
 
     scg_profile.update(vars(args))
 
-    # Print current argument setting :
-    logger.debug('VM Name : %s' % args.name)
-    logger.debug('Target Model : %s' % args.type)
-    logger.debug('Target Branch : %s' % args.branch)
-    logger.debug('Target Build : %s' % args.build)
-    logger.debug('NIC Count : %s' % args.nic)
-    logger.debug('Memory allocated : %d' % args.memory)
-
-    # version = args.build
+    logger.info(scg_profile.__repr__())
 
     # TODO: Need validate SCG Parameters here
 
@@ -108,8 +107,6 @@ def deploy(argv):
         else:
             f.execute_jenkins(scg_profile)
 
-        # cmd = ScriptFactory.create(scg_profile, f.local_qcow2_path, f.local_img_path,
-        #                           f.local_kernel_path).generate()
         cmd = ScriptFactory.create(scg_profile, f.local_storage_params()).generate()
         logger.debug('executing command : %s' % cmd)
         scg_profile.update({'status': 'stage1'})
@@ -149,8 +146,28 @@ def deploy(argv):
         logger.debug('Cleanup for ipxe server....')
         ipxe_server.cleanup_ipxe_thread()
         scg_profile.update({'status': 'running' if succeed else 'damaged'})
+        scg_profile.update_lastseen()
         with open_scg_dao() as dao:
             dao.update(scg_profile)
 
+        if args.sanity_test:
+            # Sanity test result
+            print('Sanity Test result : %r' % succeed)
+            if succeed:
+                print('Sanity test for %s for profile %s is succeed, deleting %s' % (args.name, args.type, args.name))
+                send_email('Sanity Test Result %s@%s - %s' % (scg_profile['build'], scg_profile['branch'], 'Succeed'),
+                           'sanity-test@kvm01.local', ['rayer.tung@ruckuswireless.com'], 'Setup succeed!')
+                Utilities.del_vm(args.name)
+                return True
+            else:
+                print('Sanity test for %s for profile %s is succeed, deleting %s' % (args.name, args.type, args.name))
+                send_email('Sanity Test Result %s@%s - %s' % (scg_profile['build'], scg_profile['branch'], 'Failed!'),
+                           'sanity-test@kvm01.local', ['rayer.tung@ruckuswireless.com'], 'Setup Failed!!')
+                return False
+
+    return succeed
+
+
 if __name__ == '__main__':
-    deploy(sys.argv[1:])
+    success = deploy(sys.argv[1:])
+    exit(1 if success else 0)

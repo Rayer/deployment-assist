@@ -59,9 +59,10 @@ class InteractiveShell:
 
         check = False
         supported_build = Utilities.get_branch_versions(self.args.branch, self.args.type)
+        max_build = Utilities.get_most_recent_version(self.args.branch, self.args.type)
 
         while not check:
-            version_input = raw_input('Enter version or \'i\' for version list : ')
+            version_input = raw_input('Enter version or \'i\' for version list [%s]: ' % max_build)
             if version_input is 'i':
                 print('Available versions for %s of %s: ' %
                       (self.args.type, Utilities.get_branch_version_indicator(self.args.branch)))
@@ -69,6 +70,9 @@ class InteractiveShell:
                     sys.stdout.write('%d ' % build)
                 print('')
             else:
+                if version_input == '':
+                    version_input = max_build
+
                 if int(version_input) in supported_build:
                     check = True
                     self.args.build = version_input

@@ -6,7 +6,7 @@ import re
 import Comm.CommConfig
 from Comm.Broadcaster import Broadcaster
 from Comm.Cmds import *
-from Utils.ProfileUtils import ProfileParser, smart_dict
+from Utils.ProfileUtils import ProfileParser, SCG_PROFILE
 
 __author__ = 'rayer'
 
@@ -31,7 +31,7 @@ class CmdHandler:
                 p_parser = ProfileParser(running)
                 running.update({'management_ip': p_parser.get_management_ip(), 'control_ip': p_parser.get_control_ip()})
                 p_parser.get_status_color_print()(
-                    '[%(id)3s][%(status)-11s]:\t%(name)-30s\t%(type)5s\t%(build)5s@%(branch)-9s\t%(management_ip)-16s\t%(control_ip)-16s' % smart_dict(
+                    '[%(id)3s][%(status)-11s]:\t%(name)-30s\t%(type)5s\t%(build)5s@%(branch)-9s\t%(management_ip)-16s\t%(control_ip)-16s' % SCG_PROFILE(
                         running))
 
             print('Shut VMs Count : %d' % server_info[0]['shutdown'].__len__())
@@ -39,7 +39,7 @@ class CmdHandler:
                 p_parser = ProfileParser(stopped)
                 stopped.update({'management_ip': None})
                 p_parser.get_status_color_print()(
-                    '[%(id)3s][%(status)-11s]:\t%(name)-30s\t%(type)5s\t%(build)5s@%(branch)-9s' % smart_dict(stopped))
+                    '[%(id)3s][%(status)-11s]:\t%(name)-30s\t%(type)5s\t%(build)5s@%(branch)-9s' % SCG_PROFILE(stopped))
 
             print('')
 

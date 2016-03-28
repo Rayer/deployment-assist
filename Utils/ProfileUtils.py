@@ -1,3 +1,6 @@
+from datetime import datetime
+import time
+
 from Utils.Font import *
 
 
@@ -79,6 +82,24 @@ class ProfileParser:
             self.profile['status'] = status
 
 
-class smart_dict(dict):
+class SCG_PROFILE(dict):
     def __missing__(self, key):
         return None
+
+    def __repr__(self):
+        return '''
+        VM Name : {p[name]}
+        Model   : {p[type]}
+        Branch  : {p[branch]}
+        Build   : {p[build]}
+        NICs    : {p[nic]}
+        Memory  : {p[memory]}
+        CPUs    : {p[cpu]}
+        Sanity  : {p[sanity_test]}
+        Start at: {local}
+        '''.format(p=self, local=datetime.fromtimestamp(self['init_time']))
+
+    def update_lastseen(self):
+        self.update({'lastseen': time.localtime()})
+
+

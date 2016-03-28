@@ -107,6 +107,11 @@ def get_branch_versions(branch, variant):
     return ret
 
 
+def get_most_recent_version(branch, variant):
+    supported_build = get_branch_versions(branch, variant)
+    return str(max([int(a) for a in supported_build]))
+
+
 def get_branch_download_dirs(branch, variant):
     target_url = get_root_path(branch, variant)
     result = urllib2.urlopen(target_url)
