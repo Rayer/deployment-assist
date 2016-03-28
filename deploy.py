@@ -1,6 +1,7 @@
 #!/usr/bin/python
 import argparse
 import os
+import socket
 import sys
 import time
 import traceback
@@ -20,7 +21,6 @@ from interactive import InteractiveShell
 
 __author__ = 'rayer'
 
-
 ''' Use cases :
     deploy # deploy with "SCG, Mainline, newest"
     deploy scg_name --type vscg
@@ -38,6 +38,7 @@ def prepare_snapshot(ip):
     uuid = api.do_get_control_plane_list()['list'][0]['cpUUID']
     return api.do_get_snap_logs(uuid).content
 
+
 def deploy(argv):
     # Dump default values into SCG Profile.
     logger = Logger().get_logger()
@@ -48,13 +49,16 @@ def deploy(argv):
 
     parser = argparse.ArgumentParser(description='SCG Deploy Utility. Current only supports scg/vscg')
     parser.add_argument('name', metavar='name')
-    parser.add_argument('-t', '--type', choices=['scg', 'scge', 'vscg'], help='target SCG type', default='vscg', dest='type')
+    parser.add_argument('-t', '--type', choices=['scg', 'scge', 'vscg'], help='target SCG type', default='vscg',
+                        dest='type')
     parser.add_argument('-b', '--branch', choices=supported_version, help='Target branch', default='ml', dest='branch')
     parser.add_argument('-B', '--build', help='Target Build Number', default='0', dest='build')
     # parser.add_argument('-n', '--nic', choices=[1, 3], help='NIC Count', type=int, default='3', dest='nic')
-    parser.add_argument('-i', '--interactive', help='Interactive mode, all other argument will be ignored!', action='store_true')
+    parser.add_argument('-i', '--interactive', help='Interactive mode, all other argument will be ignored!',
+                        action='store_true')
     parser.add_argument('-6', '--ipv6', help='Active IPV6', action='store_true')
-    parser.add_argument('-1', '--stage1_only', help='Only download/install SCG, don\'t do automation setup', action='store_true')
+    parser.add_argument('-1', '--stage1_only', help='Only download/install SCG, don\'t do automation setup',
+                        action='store_true')
     parser.add_argument('-f', '--force', help='Delete conflict VMs on sight without prompt', action='store_true')
     parser.add_argument('-m', '--memory', help='How much memory assigned to VM', default=default_kvm_memory_allocated,
                         dest='memory', type=int)
@@ -62,7 +66,8 @@ def deploy(argv):
     parser.add_argument('--kernel_path', help='Private build kernel location', dest='kernel_path', default='')
     parser.add_argument('--image_path', help='Private build image location', dest='image_path', default='')
     parser.add_argument('--sanity_test', help='Test sanity of a build', action='store_true')
-    parser.add_argument('--email', help='Sanity test email inform target', default='dl-tdc-eng-nms-scg-app@ruckuswireless.com')
+    parser.add_argument('--email', help='Sanity test email inform target',
+                        default='dl-tdc-eng-nms-scg-app@ruckuswireless.com')
 
     args = parser.parse_args(argv)
 
@@ -159,11 +164,12 @@ def deploy(argv):
         if args.sanity_test:
             # Sanity test result
             print('Sanity Test result : %r' % succeed)
+            sender = 'sanity-test@{}'.format(socket.gethostname())
             if succeed:
                 logger.info(
                     'Sanity test for %s for profile %s is completed, deleting %s' % (args.name, args.type, args.name))
                 send_email('Sanity Test Result %s@%s - %s' % (scg_profile['build'], scg_profile['branch'], 'Succeed'),
-                           'sanity-test@kvm01.local', [args.email], 'Setup succeed!')
+                           sender, [args.email], 'Setup succeed!')
                 Utilities.del_vm(args.name)
                 return True
             else:
@@ -183,7 +189,7 @@ def deploy(argv):
                 logger.info(
                     'Sanity test for %s for profile %s is completed, won\'t %s' % (args.name, args.type, args.name))
                 send_email('Sanity Test Result %s@%s - %s' % (scg_profile['build'], scg_profile['branch'], 'Failed!'),
-                           'sanity-test@kvm01.local', [args.email],
+                           sender, [args.email],
                            '''
 Setup Failed! please download snapshot manually
 
@@ -192,7 +198,7 @@ Setup Failed! please download snapshot manually
                 if snapshot is not None:
                     send_email(
                         'Sanity Test Result %s@%s - %s' % (scg_profile['build'], scg_profile['branch'], 'Failed!'),
-                        'sanity-test@kvm01.local', [args.email], 'Setup Failed!!',
+                        sender, [args.email], 'Setup Failed!!',
                         snapshot)
                 return False
 

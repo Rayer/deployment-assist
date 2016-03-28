@@ -163,7 +163,7 @@ class Automation(SanityTestModule):
         c.sendline('admin!234')
         c.sendline('admin!234')
 
-        c.expect(['Please login again.', 'Failed'], timeout=constant.scg_final_stage_wait_time)
+        index = c.expect(['Please login again.', 'Failed'], timeout=constant.scg_final_stage_wait_time)
 
         if index == 1:  # Failed
             self.__mark_as_failed__()
@@ -252,7 +252,7 @@ class Automation(SanityTestModule):
         c.sendline('admin!234')
         c.sendline('admin!234')
 
-        c.expect(['Please login again.', 'Failed'], timeout=constant.scg_final_stage_wait_time)
+        index = c.expect(['Please login again.', 'Failed'], timeout=constant.scg_final_stage_wait_time)
 
         if index == 1:  # Failed
             self.__mark_as_failed__()
@@ -375,7 +375,7 @@ class Automation(SanityTestModule):
         c.sendline('admin!234')
         c.sendline('admin!234')
 
-        c.expect(['Please login again.', 'Failed'], timeout=constant.scg_final_stage_wait_time)
+        index = c.expect(['Please login again.', 'Failed'], timeout=constant.scg_final_stage_wait_time)
 
         if index == 1:  # Failed
             self.__mark_as_failed__()
