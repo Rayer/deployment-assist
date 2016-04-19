@@ -38,6 +38,19 @@ resource_map = {
                 'vscg': None
             }
         },
+        '3.5-integ': {
+            'version': '3.5.0.0.{$build}',
+            # scge/3.5.0.0/installer/3.5.0.0.1/
+            'variants': {
+                'scg': None,
+                'scge': {
+                    'root': '{$master}scge/3.5/3.5.0.0/installer/',
+                    'kernel': '{$root}/{$version}/vmlinuz',
+                    'image': '{$root}/{$version}/scge-installer_{$version}.img'
+                },
+                'vscg': None
+            }
+        },
         'sz3.2.1': {
             'version': '3.2.1.0.{$build}',
             'variants': {
