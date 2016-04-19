@@ -10,18 +10,18 @@ resource_map = {
             'version': '3.4.0.0.{$build}',
             'variants': {
                 'scg': {
-                    'root': '{$master}scg/ML/installer/',
+                    'root': '{$master}scg/ML/installer',
                     'kernel': '{$root}/{$version}/vmlinuz',
                     'image': '{$root}/{$version}/scg-installer_{$version}.img'
                 },
                 'scge': {
-                    'root': '{$master}scge/ML/installer/',
+                    'root': '{$master}scge/ML/installer',
                     'kernel': '{$root}/{$version}/vmlinuz',
                     'image': '{$root}/{$version}/scge-installer_{$version}.img'
 
                 },
                 'vscg': {
-                    'root': '{$master}vscg/ML/installer/',
+                    'root': '{$master}vscg/ML/installer',
                     'image': '{$root}/{$version}/vscg-{$version}.qcow2'
                 }}
         },
@@ -31,7 +31,7 @@ resource_map = {
             'variants': {
                 'scg': None,
                 'scge': {
-                    'root': '{$master}scge/3.5-UX/3.5.0.0/installer/',
+                    'root': '{$master}scge/3.5-UX/3.5.0.0/installer',
                     'kernel': '{$root}/{$version}/vmlinuz',
                     'image': '{$root}/{$version}/scge-installer_{$version}.img'
                 },
@@ -44,7 +44,7 @@ resource_map = {
             'variants': {
                 'scg': None,
                 'scge': {
-                    'root': '{$master}scge/3.5/3.5.0.0/installer/',
+                    'root': '{$master}scge/3.5/3.5.0.0/installer',
                     'kernel': '{$root}/{$version}/vmlinuz',
                     'image': '{$root}/{$version}/scge-installer_{$version}.img'
                 },
@@ -55,17 +55,17 @@ resource_map = {
             'version': '3.2.1.0.{$build}',
             'variants': {
                 'scg': {
-                    'root': '{$master}scg/3.2.1.0/installer/',
+                    'root': '{$master}scg/3.2.1.0/installer',
                     'kernel': '{$root}/{$version}/vmlinuz',
                     'image': '{$root}/{$version}/scg-installer_{$version}.img'
                 },
                 'scge': {
-                    'root': '{$master}scge/3.2.1.0/installer/',
+                    'root': '{$master}scge/3.2.1.0/installer',
                     'kernel': '{$root}/{$version}/vmlinuz',
                     'image': '{$root}/{$version}/scge-installer_{$version}.img'
                 },
                 'vscg': {
-                    'root': '{$master}vscg/3.2.1.0/installer/',
+                    'root': '{$master}vscg/3.2.1.0/installer',
                     'image': '{$root}/{$version}/vscg-{$version}.qcow2'
                 }
             }
@@ -131,17 +131,17 @@ resource_map = {
             'version': '3.2.0.0.{$build}',
             'variants': {
                 'scg': {
-                    'root': '{$master}scg/3.2.0.0/installer/',
+                    'root': '{$master}scg/3.2.0.0/installer',
                     'kernel': '{$root}/{$version}/vmlinuz',
                     'image': '{$root}/{$version}/scg-installer_{$version}.img'
                 },
                 'scge': {
-                    'root': '{$master}scge/3.2.0.0/installer/',
+                    'root': '{$master}scge/3.2.0.0/installer',
                     'kernel': '{$root}/{$version}/vmlinuz',
                     'image': '{$root}/{$version}/scge-installer_{$version}.img'
                 },
                 'vscg': {
-                    'root': '{$master}vscg/3.2.0.0/installer/',
+                    'root': '{$master}vscg/3.2.0.0/installer',
                     'image': '{$root}/{$version}/vscg-{$version}.qcow2'
                 }
             }
