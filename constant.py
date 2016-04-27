@@ -32,7 +32,7 @@ resource_map = {
                 'scg': {
                     'root': '{$master}scg/3.5/3.5.0.0/installer',
                     'kernel': '{$root}/{$version}/vmlinuz',
-                    'image': '{$root}/{$version}/scge-installer_{$version}.img'
+                    'image': '{$root}/{$version}/scg-installer_{$version}.img'
                 },
                 'scge': {
                     'root': '{$master}scge/3.5/3.5.0.0/installer',
