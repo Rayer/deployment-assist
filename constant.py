@@ -25,24 +25,15 @@ resource_map = {
                     'image': '{$root}/{$version}/vscg-{$version}.qcow2'
                 }}
         },
-        '3.5-UX': {
-            'version': '3.5.0.0.{$build}',
-            # scge/3.5.0.0/installer/3.5.0.0.1/
-            'variants': {
-                'scg': None,
-                'scge': {
-                    'root': '{$master}scge/3.5-UX/3.5.0.0/installer',
-                    'kernel': '{$root}/{$version}/vmlinuz',
-                    'image': '{$root}/{$version}/scge-installer_{$version}.img'
-                },
-                'vscg': None
-            }
-        },
         '3.5-integ': {
             'version': '3.5.0.0.{$build}',
             # scge/3.5.0.0/installer/3.5.0.0.1/
             'variants': {
-                'scg': None,
+                'scg': {
+                    'root': '{$master}scg/3.5/3.5.0.0/installer',
+                    'kernel': '{$root}/{$version}/vmlinuz',
+                    'image': '{$root}/{$version}/scge-installer_{$version}.img'
+                },
                 'scge': {
                     'root': '{$master}scge/3.5/3.5.0.0/installer',
                     'kernel': '{$root}/{$version}/vmlinuz',
