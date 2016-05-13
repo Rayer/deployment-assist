@@ -62,7 +62,7 @@ resource_map = {
             }
         },
         'sz3.2.1-mr': {
-            'version': '3.2.1.0-mr.{$build}',
+            'version': '3.2.1.0.{$build}',
             'variants': {
                 'scg': {
                     'root': '{$master}scg/3.2.1.0-mr/installer',
