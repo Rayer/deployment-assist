@@ -202,6 +202,8 @@ def get_vm_list():
         else:
             ret['shutdown'].append(ret_data)
 
+    ret['ipxe_running'].append(check_if_ipxe_running())
+
     return ret
 
 
@@ -409,3 +411,14 @@ def purge_storage():
         if vm_storage.replace('.qcow2', '').replace(constant.vm_storage_path, '') not in vm_names:
             print('Removing untethered image file : %s' % vm_storage)
             os.remove(vm_storage)
+
+
+def check_if_ipxe_running():
+    ret_list = subprocess.check_output(['netstat', '-nlp']).splitlines()
+    running = False
+    for line in ret_list:
+        if '0.0.0.0:12000' in line:
+            running = True
+            break
+    return running
+
