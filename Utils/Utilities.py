@@ -202,7 +202,7 @@ def get_vm_list():
         else:
             ret['shutdown'].append(ret_data)
 
-    ret['ipxe_running'].append(check_if_ipxe_running())
+    ret.update({'ipxe_running': check_if_ipxe_running()})
 
     return ret
 
