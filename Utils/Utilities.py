@@ -221,6 +221,7 @@ def get_host_stats():
     ret = {}
     ret.update(mem)
     ret.update(vms)
+    ret.update({'ipxe_running': check_if_ipxe_running()})
     return ret
 
 
