@@ -448,7 +448,7 @@ class Automation(SanityTestModule):
         # system('virsh start %s' % self.name)
         retry = 10
         while subprocess.call(['virsh', 'start', self.name]) != 0:
-            retry -= 1
+            retry -= 15
             print('Domain %s seems still in installation process, wait for another 30 sec' % self.name)
             self.__prompt_pause(30)
             if retry < 0:
