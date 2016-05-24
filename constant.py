@@ -42,7 +42,7 @@ resource_map = {
                     'image': '{$root}/{$version}/vscg-{$version}.qcow2'
                 }}
         },
-        '3.5-integ': {
+        'sz3.5-int': {
             'version': '3.5.0.0.{$build}',
             # scge/3.5.0.0/installer/3.5.0.0.1/
             'variants': {
@@ -202,8 +202,8 @@ scg_default_values = {
     'branch': ('ml', None),
     'build': (1, None),
     'nic': (3, [1, 3]),
-    'cpu': (2, range(1, 4)),
-    'memory': (16, range(7, 32)),
+    'cpu': (8, range(1, 12)),
+    'memory': (16, range(7, 64)),
     'ipv6': (False, [True, False]),
     'status': ('initialize', None)
 }
