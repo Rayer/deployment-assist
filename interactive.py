@@ -39,17 +39,16 @@ class InteractiveShell:
         check = False
         support_branches = Utilities.get_supported_branches()
         while not check:
-            print('Supported Branches : ')
-            print('0 : Private Build')
+
             for b in support_branches:
                 print('%d : %s' % (support_branches.index(b) + 1, b))
 
             branch_index = raw_input('Select a branch : ')
             if branch_index == '0':
-                self.args.private = True
+                print('No private local installation allow anymore, please use deploy_private')
             else:
                 self.args.branch = support_branches[int(branch_index) - 1]
-            check = True
+                check = True
 
     def __handle_version(self):
 
