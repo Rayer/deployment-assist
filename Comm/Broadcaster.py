@@ -14,7 +14,7 @@ Periodically broadcast request, and responser will response request
 
 
 class Broadcaster:
-    def_buffersize = 8192
+    def_buffersize = 512 * 1024
 
     def __init__(self, bind_port=proto_port):
         self.socket = socket(AF_INET, SOCK_DGRAM)
