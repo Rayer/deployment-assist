@@ -131,7 +131,7 @@ def get_sesame2(serial):
     h.request('GET', '/passphrase.php?serial=%s' % serial)
     res = h.getresponse().read()
     # print('Parsed Sesame2 result : %s ' % res)
-    return res.split('\'')[1]
+    return res.rstrip().lstrip()
 
 
 def setup_system_symbolic_links(script_bin_path):
