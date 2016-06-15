@@ -7,7 +7,7 @@ resource_map = {
     'master': 'http://172.17.17.38:8081/nexus/content/groups/ruckus-public/ruckus/official/',
     'branches': {
         'ml': {
-            'version': '3.4.0.0.{$build}',
+            'version': '3.5.0.0.{$build}',
             'variants': {
                 'scg': {
                     'root': '{$master}scg/ML/installer',
