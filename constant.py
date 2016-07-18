@@ -12,7 +12,8 @@ resource_map = {
                 'scg': {
                     'root': '{$master}scg/ML/installer',
                     'kernel': '{$root}/{$version}/vmlinuz',
-                    'image': '{$root}/{$version}/scg-installer_{$version}.img'
+                    'image': '{$root}/{$version}/scg-installer_{$version}.img',
+                    'profile': 'sz35_scg'
                 },
                 'scge': {
                     'root': '{$master}scge/ML/installer',
@@ -41,23 +42,6 @@ resource_map = {
                     'root': '{$master}vscg/3.4/3.4.0.0/installer',
                     'image': '{$root}/{$version}/vscg-{$version}.qcow2'
                 }}
-        },
-        'sz3.5-int': {
-            'version': '3.5.0.0.{$build}',
-            # scge/3.5.0.0/installer/3.5.0.0.1/
-            'variants': {
-                'scg': {
-                    'root': '{$master}scg/3.5/3.5.0.0/installer',
-                    'kernel': '{$root}/{$version}/vmlinuz',
-                    'image': '{$root}/{$version}/scg-installer_{$version}.img'
-                },
-                'scge': {
-                    'root': '{$master}scge/3.5/3.5.0.0/installer',
-                    'kernel': '{$root}/{$version}/vmlinuz',
-                    'image': '{$root}/{$version}/scge-installer_{$version}.img'
-                },
-                'vscg': None
-            }
         },
         'sz3.2.1': {
             'version': '3.2.1.0.{$build}',
