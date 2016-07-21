@@ -86,12 +86,18 @@ class CmdHandler:
         for (kvm_server, target_name) in ret_array:
             os.system('ssh -t root@%s -C \'vmmanage start %s\'' % (kvm_server, target_name))
 
-    def exec_cmd(self, cmd):
-        res_list = self.broadcaster.broadcast(ExecCmd(cmd))
-        for exec_res in res_list:
-            print('From : %s(%s)' % (exec_res[0]['host'], exec_res[1][0]))
-            print(exec_res[0]['res'])
-            print('\n')
+    def exec_cmd(self, cmd, blocking):
+        if blocking is True:
+            target_list = self.broadcaster.broadcast(GetKVMHostStat())
+            for vms in target_list:
+                ip = self.__get_ip_from_server_info__(vms)
+                os.system('ssh -t root@%s -C \'%s\'' % (ip, cmd))
+        else:
+            res_list = self.broadcaster.broadcast(ExecCmd(cmd))
+            for exec_res in res_list:
+                print('From : %s(%s)' % (exec_res[0]['host'], exec_res[1][0]))
+                print(exec_res[0]['res'])
+                print('\n')
 
     def exec_search(self, vm_name_regex):
         ret = self.broadcaster.broadcast(GetVMList())
@@ -183,6 +189,7 @@ if __name__ == '__main__':
     add_filters(start_parser)
 
     cmdexec_parser = sub_parsers.add_parser('exec', help='Execute a command for all hosts')
+    cmdexec_parser.add_argument('-b', '--blocking', help='Block Mode, will execute one by one', action='store_true')
     cmdexec_parser.add_argument('command', help='(Danger)Command wants all client to execute')
 
     search_parser = sub_parsers.add_parser('search', help='Search VMs')
@@ -215,7 +222,7 @@ if __name__ == '__main__':
         CmdHandler().delete(args.name, args.host)
 
     if args.subcmd == 'exec':
-        CmdHandler().exec_cmd(args.command)
+        CmdHandler().exec_cmd(args.command, args.blocking)
 
     if args.subcmd == 'search':
         CmdHandler().exec_search(args.keyword)
