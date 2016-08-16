@@ -91,7 +91,7 @@ def deploy(argv):
     # args.nic = 1 if args.type == 'scge' else 3
     args.nic = 3
     # args.private = False
-    if args.build == '0':
+    if args.build == '0' and args.private is False:
         args.build = Utilities.get_most_recent_version(args.branch, args.type)
 
     if args.interactive:
