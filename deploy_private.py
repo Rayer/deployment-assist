@@ -17,6 +17,7 @@ if __name__ == '__main__':
 
         vm_map = []
         vm_list = Broadcaster().broadcast(GetVMList())
+        vm_list.sort()
         for vm_info in vm_list:
             vm_map.append((vm_info[0]['host'], vm_info[1][0]))
         if vm_map.__len__() <= 0:

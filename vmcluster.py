@@ -15,8 +15,13 @@ class CmdHandler:
     def __init__(self):
         self.broadcaster = Broadcaster(Comm.CommConfig.proto_port)
 
+    def get_server_info_list(self):
+        server_info_list = Broadcaster(Comm.CommConfig.proto_port).broadcast(GetVMList())
+        server_info_list.sort()
+        return server_info_list
+
     def show(self, vm_detail=False, host_ip=None):
-        server_info_list = self.broadcaster.broadcast(GetVMList())
+        server_info_list = self.get_server_info_list()
         for server_info in server_info_list:
             if not vm_detail:
                 print('%s(%s)\tOnline:%d\tOffline:%d' % (
@@ -100,7 +105,7 @@ class CmdHandler:
                 print('\n')
 
     def exec_search(self, vm_name_regex):
-        ret = self.broadcaster.broadcast(GetVMList())
+        ret = self.get_server_info_list()
         pattern = re.compile(vm_name_regex)
         for server_info in ret:
             print('At %(ip)s(%(name)s) : ' % {'ip': self.__get_ip_from_server_info__(server_info),
@@ -125,7 +130,7 @@ class CmdHandler:
     def __exec_operation__(self, target_stat, name_filter=None, host_filter=None):
         name_pattern = re.compile(name_filter if name_filter is not None else '')
         host_pattern = re.compile(host_filter if host_filter is not None else '')
-        ret = self.broadcaster.broadcast(GetVMList())
+        ret = self.get_server_info_list()
         stat_list = ['running', 'shutdown'] if target_stat == 'all' else [target_stat]
         print('Available VMs : ')
         vm_list = []
@@ -192,6 +197,8 @@ if __name__ == '__main__':
     cmdexec_parser.add_argument('-b', '--blocking', help='Block Mode, will execute one by one', action='store_true')
     cmdexec_parser.add_argument('command', help='(Danger)Command wants all client to execute')
 
+    upgrade_parser = sub_parsers.add_parser('upgrade', help='Upgrade program for all hosts')
+
     search_parser = sub_parsers.add_parser('search', help='Search VMs')
     search_parser.add_argument('keyword', help='Search keyword')
 
@@ -235,3 +242,7 @@ if __name__ == '__main__':
 
     if args.subcmd == 'start':
         CmdHandler().exec_start(args.name, args.host)
+
+    if args.subcmd == 'upgrade':
+        exec_cmds = 'cd /kvm_images/tools/kvm-deployment;git pull;vmmanage setup'
+        CmdHandler().exec_cmd(exec_cmds, True)
