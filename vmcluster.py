@@ -16,7 +16,7 @@ class CmdHandler:
         self.broadcaster = Broadcaster(Comm.CommConfig.proto_port)
 
     def get_server_info_list(self):
-        server_info_list = Broadcaster(Comm.CommConfig.proto_port).broadcast(GetVMList())
+        server_info_list = self.broadcaster.broadcast(GetVMList())
         server_info_list.sort()
         return server_info_list
 
@@ -30,7 +30,7 @@ class CmdHandler:
                 continue
             # prepare detail
             print('KVM Name : %s' % server_info[0].get('host', 'None'))
-            print('KVM IP : %s' % server_info[1][0])
+            print('KVM IP : {0}'.format(server_info[1][0]))
             print('Running VMs Count : %d' % server_info[0]['running'].__len__())
             for running in server_info[0]['running']:
                 p_parser = ProfileParser(running)
@@ -93,10 +93,15 @@ class CmdHandler:
 
     def exec_cmd(self, cmd, blocking):
         if blocking is True:
-            target_list = self.broadcaster.broadcast(GetKVMHostStat())
+            target_list = self.get_server_info_list()
+            print('Apply to below {} servers : '.format(len(target_list)))
             for vms in target_list:
-                ip = self.__get_ip_from_server_info__(vms)
+                ip = vms[1][0]
+                hostname = vms[0].get('host', 'None')
+                print('===== {0}({1}) execution start ====='.format(hostname, ip))
                 os.system('ssh -t root@%s -C \'%s\'' % (ip, cmd))
+                print('===== {0}({1}) execution end =====\n'.format(hostname, ip))
+
         else:
             res_list = self.broadcaster.broadcast(ExecCmd(cmd))
             for exec_res in res_list:
