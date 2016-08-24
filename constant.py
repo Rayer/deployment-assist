@@ -44,6 +44,24 @@ resource_map = {
                     'image': '{$root}/{$version}/vscg-{$version}.qcow2'
                 }}
         },
+        'sz3.4.1': {
+            'version': '3.4.1.0.{$build}',
+            'variants': {
+                'scg': {
+                    'root': '{$master}scg/3.4.1.0/installer',
+                    'kernel': '{$root}/{$version}/vmlinuz',
+                    'image': '{$root}/{$version}/scg-installer_{$version}.img'
+                },
+                'scge': {
+                    'root': '{$master}scge/3.4.1.0/installer',
+                    'kernel': '{$root}/{$version}/vmlinuz',
+                    'image': '{$root}/{$version}/scge-installer_{$version}.img'
+                },
+                'vscg': {
+                    'root': '{$master}vscg/3.4.1.0/installer',
+                    'image': '{$root}/{$version}/vscg-{$version}.qcow2'
+                }}
+        },
         'sz3.4-rel': {
             'version': '3.4.0.0.{$build}',
             'variants': {
