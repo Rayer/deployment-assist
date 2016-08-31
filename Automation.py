@@ -172,7 +172,7 @@ class Automation(SanityTestModule):
         c.sendline('')
 
         self.__do_scg_login(c, 'admin', 'admin!234')
-        # self.__do_sesame2(c)
+        self.__do_fixed_sesame2(c)
         c.sendline('exit')
 
         # TODO : Requires a callback hook
@@ -261,7 +261,7 @@ class Automation(SanityTestModule):
         c.sendline('')
 
         self.__do_scg_login(c, 'admin', 'admin!234')
-        # self.__do_sesame2(c)
+        self.__do_fixed_sesame2(c)
         c.sendline('exit')
 
     def execute_vscg(self):
@@ -382,7 +382,7 @@ class Automation(SanityTestModule):
 
         c.sendline('')
         self.__do_scg_login(c, 'admin', 'admin!234')
-        # self.__do_sesame2(c)
+        # self.__do_fixed_sesame2(c)
 
         print('Installation finished!')
 
@@ -423,6 +423,19 @@ class Automation(SanityTestModule):
         c.expect('Passphrase')
         c.sendline(sesame2)
         c.expect('bash')
+
+    def __do_fixed_sesame2(self, c):
+        c.sendline('debug')
+        c.expect(['debug'])
+        c.sendline('save passphrase')
+        c.expect(['debug'])
+        c.sendline('exit')
+        c.expect('#')
+        c.sendline('!v54!')
+        c.expect(':')
+        c.sendline(constant.scg_default_saseme)
+
+
 
     def __prompt_pause(self, time_sec):
         timer = time_sec

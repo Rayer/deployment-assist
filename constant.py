@@ -18,7 +18,7 @@ resource_map = {
                 'scge': {
                     'root': '{$master}scge/3.5-ML/installer',
                     'kernel': '{$root}/{$version}/vmlinuz',
-                    'image': '{$root}/{$version}/scge-installer_{$version}.img'
+                    'image': '{$root}/{$version}/scge-installer_{$version}.img',
                 },
                 'vscg': {
                     'root': '{$master}vscg/3.5-ML/installer',
@@ -205,7 +205,7 @@ scg_cluster_br = 'bridge1'
 scg_control_br = 'bridge1'
 
 scg_default_serial = '00000089'
-scg_default_saseme = 'L340thQyugjQZIzY3oEOcDiXh0QVLM0Kytu@ntb4UAj5TF@qJrLhUwESKaj'
+scg_default_saseme = 'kZQ1na45s6dR6B0GlrnMawq6lPxMM1Ey75Pxfia@HQzCheSbUD8nzDDQCGaPzUD'
 scg_installation_wait_time = 180
 scg_final_stage_wait_time = 2400
 
@@ -227,6 +227,10 @@ scg_default_values = {
     'memory': (16, range(7, 64)),
     'ipv6': (False, [True, False]),
     'status': ('initialize', None)
+}
+
+sz35_scg_profile = {
+    'memory': 20
 }
 
 database_loc = '/root/kvm.db'
