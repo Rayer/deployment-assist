@@ -1,6 +1,6 @@
 import subprocess
 
-import Utilities
+from Utils import Utilities
 
 __author__ = 'rayer'
 

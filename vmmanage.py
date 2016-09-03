@@ -2,9 +2,9 @@
 import argparse
 import sys
 
-import Utilities
 import deploy
-from Utils.ProfileUtils import ProfileParser, smart_dict
+from Utils import Utilities
+from Utils.ProfileUtils import ProfileParser, SCG_PROFILE
 
 __author__ = 'rayer'
 
@@ -20,7 +20,7 @@ class VMManage:
             p_parser = ProfileParser(online)
             online.update({'management_ip': p_parser.get_management_ip(), 'control_ip': p_parser.get_control_ip()})
             p_parser.get_status_color_print()(
-                '[%(id)3s][%(status)-11s]:\t%(name)-30s\t%(management_ip)-16s\t%(control_ip)-16s\t%(type)5s\t%(build)s@%(branch)s' % smart_dict(
+                '[%(id)3s][%(status)-11s]:\t%(name)-30s\t%(type)5s\t%(build)5s@%(branch)-9s\t%(management_ip)-16s\t%(control_ip)-16s' % SCG_PROFILE(
                     online))
 
         print('')
@@ -28,7 +28,7 @@ class VMManage:
         for offline in vm_list['shutdown']:
             p_parser = ProfileParser(offline)
             p_parser.get_status_color_print()(
-                '[%(id)3s][%(status)-11s]:\t%(name)-30s\t%(type)5s\t%(build)s@%(branch)s' % smart_dict(offline))
+                '[%(id)3s][%(status)-11s]:\t%(name)-30s\t%(type)5s\t%(build)5s@%(branch)-9s' % SCG_PROFILE(offline))
         print('')
 
     def do_setup(self, syslink_only=False):
@@ -102,7 +102,6 @@ class VMManage:
     def purge_storage(self):
         Utilities.purge_storage()
 
-
 if __name__ == '__main__':
 
     v = VMManage()
@@ -142,3 +141,6 @@ if __name__ == '__main__':
 
     if args.command == 'purge_storage':
         v.purge_storage()
+
+    if args.command == 'scg_setup_test':
+        v.setup_test()

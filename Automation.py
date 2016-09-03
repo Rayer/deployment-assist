@@ -6,14 +6,14 @@ import xml.etree.ElementTree as ET
 
 import pexpect
 
-import Utilities
 import constant
-import ipxe_server
+from Test.SanityTestSuite import SanityTestModule
+from Utils import ipxe_server, Utilities
 
 __author__ = 'rayer'
 
 
-class Automation:
+class Automation(SanityTestModule):
     name = ''
 
     def __init__(self, scg_profile):
@@ -47,11 +47,16 @@ class Automation:
     4. Start regular SCG/SCGE automation install
     '''
 
+    def __mark_as_failed__(self):
+        SanityTestModule.__mark_as_failed__(self)
+        # TODO: just for now.
+        raise RuntimeError('Fail in setup process')
+
     def execute_scg(self):
 
         self.__handle_scg_stage1()
 
-        c = pexpect.spawn('virsh console %s' % self.name, timeout=1000)
+        c = pexpect.spawn('virsh console %s' % self.name, timeout=constant.scg_final_stage_wait_time)
         c.logfile = sys.stdout
         c.setecho(False)
 
@@ -158,12 +163,16 @@ class Automation:
         c.sendline('admin!234')
         c.sendline('admin!234')
 
-        c.expect('Please login again.', timeout=constant.scg_final_stage_wait_time)
+        index = c.expect(['Please login again.', 'Failed'], timeout=constant.scg_final_stage_wait_time)
+
+        if index == 1:  # Failed
+            self.__mark_as_failed__()
+
         print('Installation finished!')
         c.sendline('')
 
         self.__do_scg_login(c, 'admin', 'admin!234')
-        # self.__do_sesame2(c)
+        self.__do_fixed_sesame2(c)
         c.sendline('exit')
 
         # TODO : Requires a callback hook
@@ -174,7 +183,7 @@ class Automation:
 
         self.__handle_scg_stage1()
 
-        c = pexpect.spawn('virsh console %s' % self.name, timeout=1000)
+        c = pexpect.spawn('virsh console %s' % self.name, timeout=constant.scg_final_stage_wait_time)
         c.logfile = sys.stdout
         c.setecho(False)
 
@@ -243,18 +252,22 @@ class Automation:
         c.sendline('admin!234')
         c.sendline('admin!234')
 
-        c.expect('Please login again.', timeout=constant.scg_final_stage_wait_time)
+        index = c.expect(['Please login again.', 'Failed'], timeout=constant.scg_final_stage_wait_time)
+
+        if index == 1:  # Failed
+            self.__mark_as_failed__()
+
         print('Installation finished!')
         c.sendline('')
 
         self.__do_scg_login(c, 'admin', 'admin!234')
-        # self.__do_sesame2(c)
+        self.__do_fixed_sesame2(c)
         c.sendline('exit')
 
     def execute_vscg(self):
         print('Executing VSCG Automatic Setup....')
         # VSCG need somehow bigger timeout, or setup process will cause timeout
-        c = pexpect.spawn('virsh console %s' % self.name, timeout=1000)
+        c = pexpect.spawn('virsh console %s' % self.name, timeout=constant.scg_final_stage_wait_time)
         c.logfile = sys.stdout
         c.setecho(False)
         self.__do_scg_login(c, 'admin', 'admin')
@@ -267,6 +280,9 @@ class Automation:
             c.sendline('2')
         else:
             c.sendline('Carrier')
+
+        c.expect(['Are you sure', pexpect.TIMEOUT], timeout=12)
+        c.sendline('y')
 
         # This part will decide use ipv6 or not, let use ipv6
         c.expect(['Select address type'])
@@ -359,10 +375,14 @@ class Automation:
         c.sendline('admin!234')
         c.sendline('admin!234')
 
-        c.expect('Please login again.', timeout=constant.scg_final_stage_wait_time)
+        index = c.expect(['Please login again.', 'Failed'], timeout=constant.scg_final_stage_wait_time)
+
+        if index == 1:  # Failed
+            self.__mark_as_failed__()
+
         c.sendline('')
         self.__do_scg_login(c, 'admin', 'admin!234')
-        # self.__do_sesame2(c)
+        # self.__do_fixed_sesame2(c)
 
         print('Installation finished!')
 
@@ -404,6 +424,19 @@ class Automation:
         c.sendline(sesame2)
         c.expect('bash')
 
+    def __do_fixed_sesame2(self, c):
+        c.sendline('debug')
+        c.expect(['debug'])
+        c.sendline('save passphrase')
+        c.expect(['debug'])
+        c.sendline('exit')
+        c.expect('#')
+        c.sendline('!v54!')
+        c.expect(':')
+        c.sendline(constant.scg_default_saseme)
+
+
+
     def __prompt_pause(self, time_sec):
         timer = time_sec
         while timer != 0:
@@ -426,7 +459,7 @@ class Automation:
 
         print('\nStarting Virsh.....')
         # system('virsh start %s' % self.name)
-        retry = 10
+        retry = 30
         while subprocess.call(['virsh', 'start', self.name]) != 0:
             retry -= 1
             print('Domain %s seems still in installation process, wait for another 30 sec' % self.name)

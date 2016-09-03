@@ -1,7 +1,7 @@
 import os
 import sys
 
-import Utilities
+from Utils import Utilities
 from constant import *
 
 __author__='rayer'
@@ -39,17 +39,16 @@ class InteractiveShell:
         check = False
         support_branches = Utilities.get_supported_branches()
         while not check:
-            print('Supported Branches : ')
-            print('0 : Private Build')
+
             for b in support_branches:
                 print('%d : %s' % (support_branches.index(b) + 1, b))
 
             branch_index = raw_input('Select a branch : ')
             if branch_index == '0':
-                self.args.private = True
+                print('No private local installation allow anymore, please use deploy_private')
             else:
                 self.args.branch = support_branches[int(branch_index) - 1]
-            check = True
+                check = True
 
     def __handle_version(self):
 
@@ -59,9 +58,10 @@ class InteractiveShell:
 
         check = False
         supported_build = Utilities.get_branch_versions(self.args.branch, self.args.type)
+        max_build = Utilities.get_most_recent_version(self.args.branch, self.args.type)
 
         while not check:
-            version_input = raw_input('Enter version or \'i\' for version list : ')
+            version_input = raw_input('Enter version or \'i\' for version list [%s]: ' % max_build)
             if version_input is 'i':
                 print('Available versions for %s of %s: ' %
                       (self.args.type, Utilities.get_branch_version_indicator(self.args.branch)))
@@ -69,6 +69,9 @@ class InteractiveShell:
                     sys.stdout.write('%d ' % build)
                 print('')
             else:
+                if version_input == '':
+                    version_input = max_build
+
                 if int(version_input) in supported_build:
                     check = True
                     self.args.build = version_input
@@ -83,7 +86,7 @@ class InteractiveShell:
             else:
                 memory = int(memory_raw)
 
-            if memory in xrange(8, 32):
+            if memory in xrange(7, 49):
                 self.args.memory = memory
                 break
             continue

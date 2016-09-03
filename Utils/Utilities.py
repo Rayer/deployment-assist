@@ -107,6 +107,11 @@ def get_branch_versions(branch, variant):
     return ret
 
 
+def get_most_recent_version(branch, variant):
+    supported_build = get_branch_versions(branch, variant)
+    return str(max([int(a) for a in supported_build]))
+
+
 def get_branch_download_dirs(branch, variant):
     target_url = get_root_path(branch, variant)
     result = urllib2.urlopen(target_url)
@@ -126,7 +131,7 @@ def get_sesame2(serial):
     h.request('GET', '/passphrase.php?serial=%s' % serial)
     res = h.getresponse().read()
     # print('Parsed Sesame2 result : %s ' % res)
-    return res.split('\'')[1]
+    return res.rstrip().lstrip()
 
 
 def setup_system_symbolic_links(script_bin_path):
@@ -155,31 +160,49 @@ def execute_setup_scripts(script_bin_path):
 def get_vm_list():
     ret_list = subprocess.check_output(['virsh', 'list', '--all']).splitlines()
     ret = {'running': [], 'shutdown': []}
+
+    with open_scg_dao() as dao:
+        db_record = dao.record
+
     for seq in ret_list[2:]:  # Pass first two lines
         data = seq.split()
 
         if data.__len__() < 1:
             break
 
-        isRunning = data[0] != '-'
+        running = data[0] != '-'
 
-        with open_scg_dao() as dao:
-            profile = dao.read(data[1])
+        profile = db_record.get(data[1])
 
         ret_data = {
             'id': '-' if data[0] == '-' else data[0],
             'name': data[1]
         }
 
+        pp = ProfileParser(profile)
         if profile is not None:
+            if not running:
+                if pp.get_status() == 'running':
+                    pp.set_status('stopped')
+                elif pp.get_status() in ['setup', 'stage1']:
+                    pp.set_status('damaged')
+
+            else:
+                if pp.get_status() == 'stopped':
+                    pp.set_status('running')
+
+            with open_scg_dao() as dao:
+                dao.update(profile)
             ret_data.update(profile)
         else:
             ret_data.update({'status': 'unmanaged'})
 
-        if isRunning:
+        if running:
             ret['running'].append(ret_data)
         else:
             ret['shutdown'].append(ret_data)
+
+    ret.update({'ipxe_running': check_if_ipxe_running()})
 
     return ret
 
@@ -198,6 +221,7 @@ def get_host_stats():
     ret = {}
     ret.update(mem)
     ret.update(vms)
+    ret.update({'ipxe_running': check_if_ipxe_running()})
     return ret
 
 
@@ -388,3 +412,14 @@ def purge_storage():
         if vm_storage.replace('.qcow2', '').replace(constant.vm_storage_path, '') not in vm_names:
             print('Removing untethered image file : %s' % vm_storage)
             os.remove(vm_storage)
+
+
+def check_if_ipxe_running():
+    ret_list = subprocess.check_output(['netstat', '-nlp']).splitlines()
+    running = False
+    for line in ret_list:
+        if '0.0.0.0:12000' in line:
+            running = True
+            break
+    return running
+

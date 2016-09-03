@@ -1,6 +1,6 @@
 #!/usr/bin/python
 from Comm.Responser import responser_main
-from Utilities import pid_lock_utils
+from Utils.Utilities import pid_lock_utils
 
 __author__ = 'rayer'
 

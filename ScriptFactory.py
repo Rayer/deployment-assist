@@ -1,5 +1,6 @@
 
 import constant
+from Logger.Logger import Logger
 
 __author__ = 'rayer'
 
@@ -14,7 +15,7 @@ class ScriptFactory:
     @staticmethod
     # def __create_scg_factory(name, allocated_memory, nic_count, storage_path, image_path, kernel_path):
     def __create_scg_factory(scg_profile, local_files):
-        print('Start creating SCG Script factory with parameter : ')
+        Logger().get_logger().info('Start creating SCG Script factory with parameter : ')
         print(scg_profile)
         print(local_files)
         s = ScriptFactory()
@@ -25,7 +26,7 @@ class ScriptFactory:
 
     @staticmethod
     def __create_vscg_factory(scg_profile, local_files):
-        print('Start creating VSCG Script factory with parameter : ')
+        Logger().get_logger().info('Start creating VSCG Script factory with parameter : ')
         print(scg_profile)
         print(local_files)
         s = ScriptFactory()

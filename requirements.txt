@@ -1,4 +1,3 @@
 BeautifulSoup
 pexpect
-PyCrypto
-paramiko
+requests
