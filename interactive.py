@@ -2,7 +2,6 @@ import os
 import sys
 
 from Utils import Utilities
-from constant import *
 
 __author__ = 'rayer'
 
@@ -80,15 +79,16 @@ class InteractiveShell:
 
     def __handle_memory(self):
         while True:
-            memory_raw = raw_input('Allocate memory [%d] : ' % default_kvm_memory_allocated)
+            memory_raw = raw_input('Allocate memory [%d] : ' % self.args.memory)
             if memory_raw == '':
-                memory = default_kvm_memory_allocated
+                memory = self.args.memory
             else:
                 memory = int(memory_raw)
 
             if memory in xrange(7, 49):
                 self.args.memory = memory
                 break
+
             continue
 
     def __handle_customized_image(self):
