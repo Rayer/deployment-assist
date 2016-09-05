@@ -223,6 +223,7 @@ scg_default_values = {
     'branch': ('ml', None),
     'build': (1, None),
     'nic': (3, [1, 3]),
+    'nic_array': (('bridge0', 'bridge1', 'bridge1'), None),
     'cpu': (8, range(1, 12)),
     'memory': (16, range(7, 64)),
     'ipv6': (False, [True, False]),

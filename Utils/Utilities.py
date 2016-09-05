@@ -16,6 +16,7 @@ import configuration
 import constant
 from Utils.ProfileUtils import ProfileParser
 from Utils.database import open_scg_dao
+from profiles import Profiles
 
 __author__ = 'rayer'
 
@@ -63,6 +64,11 @@ def get_branch_supported_scg_type(branch):
 def __get_file_path_raw(branch, variant, file_type):
     return __get_variant(branch, variant).get(file_type)
 
+def __get_profile_name(branch, variant):
+    if 'profile' not in __get_variants_raw(branch).get(variant):
+        return 'default'
+    else:
+        return __get_variants_raw(branch).get(variant).get('profile')
 
 def get_file_path(branch, variant, file_type, build):
     # extend root first
@@ -422,4 +428,11 @@ def check_if_ipxe_running():
             running = True
             break
     return running
+
+
+def get_profile(branch, variant):
+    diff_profile = Profiles.get(__get_profile_name(branch, variant))
+    inherit_profile = Profiles.get('default') if 'inherited' not in diff_profile else Profiles.get(Profiles.get['inherited'])
+    inherit_profile.update(diff_profile)
+    return inherit_profile
 

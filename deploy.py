@@ -18,6 +18,7 @@ from Utils.ProfileUtils import SCG_PROFILE
 from Utils.database import open_scg_dao
 from constant import *
 from interactive import InteractiveShell
+from profiles import Profiles
 
 __author__ = 'rayer'
 
@@ -42,7 +43,8 @@ def prepare_snapshot(ip):
 def deploy(argv):
     # Dump default values into SCG Profile.
     logger = Logger().get_logger()
-    scg_profile = SCG_PROFILE((k, v[0]) for (k, v) in scg_default_values.items())
+    # scg_profile = SCG_PROFILE((k, v[0]) for (k, v) in scg_default_values.items())
+    scg_profile = SCG_PROFILE(Profiles['default'])
     scg_profile.update({'init_time': time.mktime(time.localtime())})
 
     supported_version = Utilities.get_supported_branches()
@@ -91,14 +93,17 @@ def deploy(argv):
     # args.nic = 1 if args.type == 'scge' else 3
     args.nic = 3
     # args.private = False
-    if args.build == '0' and args.private is False:
-        args.build = Utilities.get_most_recent_version(args.branch, args.type)
 
     if args.interactive:
         InteractiveShell(args).execute()
     elif args.private:
         # if build is 0, it means we should get most recent build
         pass
+    else:
+        profiles = Utilities.get_profile(args.branch, args.type)
+
+    if args.build == '0' and args.private is False:
+        args.build = Utilities.get_most_recent_version(args.branch, args.type)
 
     if will_delete_old_vm:
         Utilities.del_vm(args.name)

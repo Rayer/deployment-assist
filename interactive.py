@@ -4,13 +4,12 @@ import sys
 from Utils import Utilities
 from constant import *
 
-__author__='rayer'
+__author__ = 'rayer'
 
 supported_type = ['invalid', 'scg', 'scge', 'vscg']
 
 
 class InteractiveShell:
-
     args = ''
 
     def __init__(self, args):
@@ -20,6 +19,7 @@ class InteractiveShell:
     def execute(self):
         self.__handle_branch()
         self.__handle_type()
+        self.__set_profile()
         self.__handle_version()
         self.__handle_memory()
         self.__handle_ipv6()
@@ -124,3 +124,7 @@ class InteractiveShell:
             self.args.ipv6 = True
         else:
             print('IPv6 is disabled!')
+
+    def __set_profile(self):
+        profile = Utilities.get_profile(self.args.branch, self.args.type)
+        self.args.__dict__.update(profile)
