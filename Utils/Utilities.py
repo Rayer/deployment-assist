@@ -432,7 +432,8 @@ def check_if_ipxe_running():
 
 def get_profile(branch, variant):
     diff_profile = Profiles.get(__get_profile_name(branch, variant))
-    inherit_profile = Profiles.get('default') if 'inherited' not in diff_profile else Profiles.get(Profiles.get['inherited'])
+    inherit_profile = Profiles.get('default') if 'inherit' not in diff_profile else Profiles.get(
+        Profiles.get['inherit'])
     inherit_profile.update(diff_profile)
     return inherit_profile
 
