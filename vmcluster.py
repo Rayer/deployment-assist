@@ -218,7 +218,7 @@ if __name__ == '__main__':
     if args.ip:
         # do IP validation
         ip_pattern = \
-            re.compile('^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$')
+            re.compile("^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$")
         if not ip_pattern.match(args.ip):
             raise ValueError('IP address %s seems not a valid IP address!' % args.ip)
 
