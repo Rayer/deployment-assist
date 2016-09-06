@@ -1,6 +1,5 @@
 Profiles = {
     'default': {
-        'type': 'scg',
         'nic': 3,
         'nic_map': ('bridge0', 'bridge1', 'bridge1'),
         'cpu': 8,
