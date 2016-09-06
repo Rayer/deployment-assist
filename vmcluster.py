@@ -60,6 +60,7 @@ class CmdHandler:
 
     def deploy(self):
         stat = self.broadcaster.broadcast(GetKVMHostStat())
+        stat = sorted(stat, key=lambda k: k[0]['host'])
         index = 0
         for server_info in stat:
             server_info[0].update({'ip': self.__get_ip_from_server_info__(server_info), 'index': index})
