@@ -216,6 +216,7 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
 
+    broadcast_list = None
     if args.broadcast_addr is not None:
         broadcast_list = args.broadcast_addr.split(',')
 
