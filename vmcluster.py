@@ -255,8 +255,4 @@ if __name__ == '__main__':
 
     if args.subcmd == 'upgrade':
         exec_cmds = 'cd /kvm_images/tools/kvm-deployment;git pull;vmmanage setup'
-<<<<<<< HEAD
         CmdHandler(broadcast_list).exec_cmd(exec_cmds, True)
-=======
-        CmdHandler().exec_cmd(exec_cmds, True)
->>>>>>> c3c33c3eceebde7df31820de84bf4d64f027c3aa
