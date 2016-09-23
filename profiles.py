@@ -1,7 +1,5 @@
 Profiles = {
     'default': {
-        'name': 'Anonymous SCG',
-        'type': 'scg',
         'nic': 3,
         'nic_map': ('bridge0', 'bridge1', 'bridge1'),
         'cpu': 8,

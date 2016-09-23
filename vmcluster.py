@@ -60,6 +60,7 @@ class CmdHandler:
 
     def deploy(self):
         stat = self.broadcaster.broadcast(GetKVMHostStat())
+        stat = sorted(stat, key=lambda k: k[0]['host'])
         index = 0
         for server_info in stat:
             server_info[0].update({'ip': self.__get_ip_from_server_info__(server_info), 'index': index})
@@ -221,7 +222,7 @@ if __name__ == '__main__':
     if args.ip:
         # do IP validation
         ip_pattern = \
-            re.compile('^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$')
+            re.compile("^(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$")
         if not ip_pattern.match(args.ip):
             raise ValueError('IP address %s seems not a valid IP address!' % args.ip)
 
@@ -254,4 +255,8 @@ if __name__ == '__main__':
 
     if args.subcmd == 'upgrade':
         exec_cmds = 'cd /kvm_images/tools/kvm-deployment;git pull;vmmanage setup'
+<<<<<<< HEAD
         CmdHandler(broadcast_list).exec_cmd(exec_cmds, True)
+=======
+        CmdHandler().exec_cmd(exec_cmds, True)
+>>>>>>> c3c33c3eceebde7df31820de84bf4d64f027c3aa
