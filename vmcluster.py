@@ -12,8 +12,8 @@ __author__ = 'rayer'
 
 
 class CmdHandler:
-    def __init__(self):
-        self.broadcaster = Broadcaster(Comm.CommConfig.proto_port)
+    def __init__(self, broadcaster_ip_list=None):
+        self.broadcaster = Broadcaster(Comm.CommConfig.proto_port, broadcaster_ip_list)
 
     def get_server_info_list(self):
         server_info_list = self.broadcaster.broadcast(GetVMList())
@@ -181,6 +181,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='KVM Deployment Assist Cluster Tools')
     sub_parsers = parser.add_subparsers(help='Sub-command help', dest='subcmd')
     parser.add_argument('-d', '--debug', help='Enable console debugging', action='store_true')
+    parser.add_argument('-b', '--broadcast_addr', help='Broadcast Domain Address', dest='broadcast_addr')
 
     discovery_parser = sub_parsers.add_parser('show', help='Show commands')
     discovery_parser.add_argument('-v', '--verbose', help='List detailed KVM Guest info', action='store_true')
@@ -214,6 +215,9 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
 
+    if args.broadcast_addr is not None:
+        broadcast_list = args.broadcast_addr.split(',')
+
     if args.ip:
         # do IP validation
         ip_pattern = \
@@ -222,32 +226,32 @@ if __name__ == '__main__':
             raise ValueError('IP address %s seems not a valid IP address!' % args.ip)
 
     if args.subcmd == 'show':
-        CmdHandler().show(args.verbose, args.ip)
+        CmdHandler(broadcast_list).show(args.verbose, args.ip)
 
     if args.subcmd == 'stats':
-        CmdHandler().stats()
+        CmdHandler(broadcast_list).stats()
 
     if args.subcmd == 'deploy':
-        CmdHandler().deploy()
+        CmdHandler(broadcast_list).deploy()
 
     if args.subcmd == 'delete':
-        CmdHandler().delete(args.name, args.host)
+        CmdHandler(broadcast_list).delete(args.name, args.host)
 
     if args.subcmd == 'exec':
-        CmdHandler().exec_cmd(args.command, args.blocking)
+        CmdHandler(broadcast_list).exec_cmd(args.command, args.blocking)
 
     if args.subcmd == 'search':
-        CmdHandler().exec_search(args.keyword)
+        CmdHandler(broadcast_list).exec_search(args.keyword)
 
     if args.subcmd == 'console':
-        CmdHandler().exec_console(args.name, args.host)
+        CmdHandler(broadcast_list).exec_console(args.name, args.host)
 
     if args.subcmd == 'stop':
-        CmdHandler().exec_stop(args.name, args.host)
+        CmdHandler(broadcast_list).exec_stop(args.name, args.host)
 
     if args.subcmd == 'start':
-        CmdHandler().exec_start(args.name, args.host)
+        CmdHandler(broadcast_list).exec_start(args.name, args.host)
 
     if args.subcmd == 'upgrade':
         exec_cmds = 'cd /kvm_images/tools/kvm-deployment;git pull;vmmanage setup'
-        CmdHandler().exec_cmd(exec_cmds, True)
+        CmdHandler(broadcast_list).exec_cmd(exec_cmds, True)

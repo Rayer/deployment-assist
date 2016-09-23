@@ -16,12 +16,13 @@ Periodically broadcast request, and responser will response request
 class Broadcaster:
     def_buffersize = 512 * 1024
 
-    def __init__(self, bind_port=proto_port):
+    def __init__(self, bind_port=proto_port, broadcast_ip=None):
         self.socket = socket(AF_INET, SOCK_DGRAM)
         self.socket.setsockopt(SOL_SOCKET, SO_REUSEADDR, 1)
         self.socket.setsockopt(SOL_SOCKET, SO_BROADCAST, 1)
         self.socket.settimeout(broadcast_timeout)
         self.port = bind_port
+        self.brocast_ip_list = broadcast_ip if broadcast_ip is not None else broadcast_addr_list
         logger = Logger().get_logger()
         logger.info('Starting up Broadcaster...')
 
@@ -30,7 +31,7 @@ class Broadcaster:
         logger = Logger().get_logger()
         ret = []
         logger.info('Sending : %s' % raw_payload)
-        for broadcast_addr in broadcast_addr_list:
+        for broadcast_addr in self.brocast_ip_list:
             logger.debug('Sending to %s' % broadcast_addr)
             self.socket.sendto(raw_payload, (broadcast_addr, self.port))
 
