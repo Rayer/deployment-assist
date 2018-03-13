@@ -78,30 +78,33 @@ class Automation(SanityTestModule):
         # IPv4, control
         c.expect(['Select IP configuration'])
         c.sendline('2')
-        c.expect(['Are these correct'])
-        c.sendline('y')
+        #c.expect(['Are these correct'])
+        #c.sendline('y')
 
         # IPv4, cluster
         c.expect(['Select IP configuration'])
         c.sendline('2')
-        c.expect(['Are these correct'])
-        c.sendline('y')
+        #c.expect(['Are these correct'])
+        #c.sendline('y')
 
         # IPv4, management
         c.expect(['Select IP configuration'])
         c.sendline('2')
-        c.expect(['Are these correct'])
-        c.sendline('y')
+        #c.expect(['Are these correct'])
+        #c.sendline('y')
 
-        c.expect(['Select system default gateway'])
-        c.sendline('Management')
-        c.expect(['Primary'])
+        c.expect(['Select gateway interface'])
+        c.sendline('3')
+
+        #c.expect(['Select system default gateway'])
+        #c.sendline('Management')
+        c.expect(['Primary DNS'])
         c.sendline('8.8.8.8')
         c.sendline('8.8.4.4')
 
         # Prior from 3.1, it doesn't have this
-        c.expect(['Control NAT', pexpect.TIMEOUT], timeout=12)
-        c.sendline('')
+        #c.expect(['Control NAT', pexpect.TIMEOUT], timeout=12)
+        #c.sendline('')
 
         if self.ipv6:
             # IPv6, control
@@ -123,19 +126,21 @@ class Automation(SanityTestModule):
             c.expect(['Primary'])
             c.sendline('')
 
-        c.expect(['Enter "restart network" or press Enter'])
-        c.sendline('')
+        c.expect(['Do you want to apply the settings'])
+        c.sendline('y')
+        c.expect(['Accept these settings and continue'])
+        c.sendline('y')
 
         c.expect(['>', '#'])
         # 2nd time setup
         c.sendline('setup')
-        c.sendline('')
+        #c.sendline('')
         c.expect('Do you want to setup network?')
-        c.sendline('')
+        c.sendline('n')
         self.__parse_ip_carrier(c.before)
         c.expect('an exist cluster')
         c.sendline('c')
-        c.expect('Cluster Name')
+        c.expect('and dashes')
         c.sendline(Utilities.convert_blade_preferred_characters(self.name))
         c.expect('Controller Description:')
         c.sendline('Automatic installed %s' % self.name)
@@ -143,6 +148,9 @@ class Automation(SanityTestModule):
         c.sendline('y')
         c.expect('Enter the controller name of the blade')
         c.sendline('%s-C' % Utilities.convert_blade_preferred_characters(self.name))
+
+        c.expect('behind NAT')
+        c.sendline('n')
 
         # Sometimes NTP Server can't be reached...
         c.expect('NTP Server ')
